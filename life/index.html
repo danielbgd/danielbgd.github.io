@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<meta http-equiv="content-language" content="sr" />
+<meta name="author" content="">
+<meta name="resource-type" content="document" />
+<meta name="distribution" content="global" />
+<meta name="keywords" content="the game of life" />
+<meta name="description" content="The Game of Life" />
+<meta name="robots" content="index, follow" />
+<meta property="og:image" content="" />
+<meta property="og:title" content="The Game of Life" />
+<meta property="og:url" content="" />
+<meta property="og:site_name" content="The Game of Life" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="The Game of Life" />
+
+<title>The Game of Life</title>
+
+<script src="life.js"></script>
+
+<link href="life.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body onload="drawTable(60,80,1)">
+
+<div class="container">
+	<h1>The Game of Life</h1>
+	<table id="table">
+	</table>
+	<br />
+	<div class="counter-random">
+		<div id="counter"></div>
+		<div id="random">
+			<strong>Random raspored:</strong>&nbsp;&nbsp;&nbsp;&nbsp;
+			retko<input id="density" type="range" min="1" max="9" step="1" value="5" onmouseup="drawTable(0)">gusto
+		</div>
+	</div>
+	<div class="commands1">
+		<button id="white" onclick="drawTable(1)">Sva bela</button>
+		<button id="black" onclick="drawTable(2)">Sva crna</button>
+		<button id="hor" onclick="drawTable(3)">Horizontalne pruge</button>
+		<button id="vert" onclick="drawTable(4)">Vertikalne pruge</button>
+		<button id="diag" onclick="drawTable(5)">Dijagonalne pruge</button>
+		<button id="chess" onclick="drawTable(6)">Šahovski raspored</button>
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<button id="inverse" onclick="inverse()">Inverzan raspored</button>
+	</div>
+	<div class="commands2">
+		<button id="step" onclick="step()">Jedan korak</button>
+		&nbsp;&nbsp;
+		<button id="start" onclick="run()">Pokreni</button>
+		<img id="led" src="images/led_off.png" width=12 height=12 />
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		sporo<input id="speed" type="range" min="1" max="9" step="1" value="5" onmouseup="changeSpeed()">brzo
+	</div>
+</div>
+
+</body>
+
+</html>
