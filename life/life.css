@@ -87,12 +87,34 @@ button {
 	font-size: 12px;
 }
 
-#start {
-	width: 100px;
+button img {
+	margin-top: 3px;
+	margin-bottom: auto;
 }
 
-#led {
+#start {
+	width: 70px;
+}
+
+#step {
+	width: 40px;
+}
+
+.led-off, .led-on {
+	display: inline-block;
 	position: relative;
-	margin-left: 5px;
-	margin-bottom: -5px;
+	left: 4px;
+	top: 5px;
+	width: 12px;
+	height: 12px;
+}
+
+.led-off {
+	background: url(images/led.png) 0 0;
+	background-size: 12px auto;
+}
+
+.led-on {
+	background: url(images/led.png) 0 -12px;
+	background-size: 12px auto;
 }
