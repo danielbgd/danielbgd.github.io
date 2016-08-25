@@ -5,8 +5,11 @@ var counter; // brojač koraka simulacije
 var ledFlag; // indikator stanja LED-diode za vreme njenog blinkanja u režimu „PAUSE“ (0 – off; 1 – on)
 var ledLoop = 0; // varijabla timing-eventa treperenja LED-diode u režimu „PAUSE“
 var imgFolder = "images/"; // lokacija foldera za slike
-var ledOff = "led_off.png"; // naziv slike sa isključenom LED
-var ledOn = "led_on.png"; // naziv slike sa uključenom LED
+var playButton = imgFolder + "play.png"; // lokacija simbola za "PLAY"
+var pauseButton = imgFolder + "pause.png"; // lokacija simbola za "PAUSE"
+var playPauseButton = imgFolder + "play-pause.png"; // lokacija simbola za "PLAY" i "PAUSE"
+var stepButton = imgFolder + "step.png"; // lokacija simbola za "FRAME ADVANCE"
+var stepButtonDisabled = imgFolder + "step-disabled.png"; // lokacija deaktiviranog simbola za "FRAME ADVANCE"
 var mode = 0; // flag radnog režima (0 – STOP; 1 – PLAY; 2 – PAUSE)
 
 function drawTable(content) { // crtanje nove tabele (prazne ili s predefinisanim sadržajem)
@@ -18,10 +21,10 @@ function drawTable(content) { // crtanje nove tabele (prazne ili s predefinisani
 		clearInterval(ledLoop);
 	}
 	if (mode == 2) {
-		document.getElementById("start").innerHTML = "Pokreni";
+		document.getElementById("start").getElementsByTagName("img")[0].src = playButton;
 		mode = 0;
 		ledLoop = 0;
-		document.getElementById("led").src = imgFolder + ledOff;
+		document.getElementById("led").className = "led-off";
 	}
 	for (i = 1; i <= m; i++) { // petlja po vrstama
 		a += "<tr>";
@@ -96,7 +99,7 @@ function changeField(x) { // promena statusa polja pod rednim brojem x – ako j
 }
 
 function inverse() { // zamena svih živih polja mrtvima i obratno
-	for (i = 1; i <= p; i++) { // petlja po članovima niza (niz ima p=m*n članova, tj. onoliko koliko ima polja tabele)
+	for (i = 1; i <= p; i++) { // petlja po poljima tabele (polja ima p=m*n)
 		changeField(i);
 	}
 }
@@ -192,10 +195,11 @@ function setSpeed() { // podešavanje brzine na osnovu položaja klizača brzine
 function run() { // Prelazak u režim „PLAY“ ili „PAUSE“
 	if (mode == 1) { // ako je režim bio „PLAY“, prelazak u režim „PAUSE“
 		clearInterval(runLoop); // zaustavlja se radna petlja
-		document.getElementById("start").innerHTML = "Nastavi"; // na aktivacionom dugmetu se prikazuje „Nastavi“
+		document.getElementById("start").getElementsByTagName("img")[0].src = playPauseButton; // na aktivacionom dugmetu se prikazuju simboli "PLAY" i "PAUSE"
 		mode = 2; // flag radnog režima se postavlja na vrednost koji označava režim „PAUSE“
 		document.getElementById("step").disabled = false; // aktivira se dugme „Jedan korak“ (koje je bilo deaktivirano tokom režima „PLAY“)
-		document.getElementById("led").src = imgFolder + ledOff; // LED se isključuje pre započinjanja treperućeg režima
+		document.getElementById("step").getElementsByTagName("img")[0].src = stepButton; // u režimu „PAUSE“ dugme „Jedan korak“ je aktivirano
+		document.getElementById("led").className = "led-off"; // LED se isključuje pre započinjanja treperućeg režima
 		ledFlag = 0; // pre ulaska u petlju za treperenje postavljamo indikator da je LED isključena
 		ledLoop = setInterval(ledBlink, 500); // petlja za treperenje LED-diode, s periodom od 500ms
 	}
@@ -204,20 +208,21 @@ function run() { // Prelazak u režim „PLAY“ ili „PAUSE“
 			clearInterval(ledLoop); // ...zaustavlja se treperenje diode...
 			ledLoop = 0; // ...i varijabla timing-eventa treperenja se postavlja na nulu
 		}
-		document.getElementById("start").innerHTML = "Pauziraj"; // na aktivacionom dugmetu se prikazuje „Pauziraj“
+		document.getElementById("start").getElementsByTagName("img")[0].src = pauseButton; // na aktivacionom dugmetu se prikazuje simbol "PAUSE"
 		mode = 1; // flag radnog režima se postavlja na vrednost koji označava režim „PLAY“
-		document.getElementById("led").src = imgFolder + ledOn; // LED se uključuje
+		document.getElementById("led").className = "led-on"; // LED se uključuje
 		document.getElementById("step").disabled = true; // za vreme „PLAY“ režima, dugme „Jedan korak“ je deaktivirano
+		document.getElementById("step").getElementsByTagName("img")[0].src = stepButtonDisabled; // u režimu „PLAY“ dugme „Jedan korak“ je deaktivirano
 		setSpeed(); // podešavanje brzine na osnovu položaja klizača brzine i ponavljanje radne petlje
 	}
 }
 
 function ledBlink() { // treperenje LED-diode u režimu „PAUSE“
 	if (ledFlag == 1) { // ukoliko je LED uključena...
-		document.getElementById("led").src = imgFolder + ledOff; // ...isključuje se...
+		document.getElementById("led").className = "led-off"; // ...isključuje se...
 		ledFlag = 0; // ...i indikator uključene LED se postavlja na nulu
 	} else { // u suprotnom, ako je LED isključena...
-		document.getElementById("led").src = imgFolder + ledOn; // ...uključuje se...
+		document.getElementById("led").className = "led-on"; // ...uključuje se...
 		ledFlag = 1; // ...i indikator uključene LED se postavlja na jedinicu
 	}
 }
