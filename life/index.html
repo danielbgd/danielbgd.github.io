@@ -27,37 +27,120 @@
 
 </head>
 
-<body onload="drawTable(60,80,1)">
+<body onload="init()">
 
 <div class="container">
 	<h1>The Game of Life</h1>
-	<table id="table">
-	</table>
+
+	<!-- izbor jezika prikaza -->
+	<ul class="languages">
+		<li><img id="eng" src="images/eng.png" onclick="english()" /></li>
+		<li><img id="srb" src="images/srb.png" onclick="serbian()" /></li>
+	</ul>
+	
+	<!-- prikaz tabele -->
+	<table id="table"></table>
 	<br />
+
+	<!-- prvi red kontrolne table -->
 	<div class="counter-random">
+
+		<!-- prikazivanje brojača koraka -->
 		<div id="counter"></div>
+		
+		<!-- deo za odabir inicijalnog random rasporeda -->
 		<div id="random">
-			<strong>Random raspored:</strong>&nbsp;&nbsp;&nbsp;&nbsp;
-			retko<input id="density" type="range" min="1" max="9" step="1" value="5" onmouseup="drawTable(0)">gusto
+			<ul>
+				<li>
+					<strong id="rand"></strong>&nbsp;&nbsp;&nbsp;&nbsp;
+				</li>
+				<li>
+					<!-- regulator gustine inicijalnog random rasporeda -->
+					<span id="rand-thin"></span><input id="density" type="range" min="1" max="9" step="1" value="5" onmouseup="drawTable(0)"><span id="rand-thick"></span>
+					<span id="random-tip" class="tip"></span>
+				</li>
+			</ul>
 		</div>
 	</div>
+
+	<!-- drugi red kontrolne table -->
 	<div class="commands1">
-		<button id="white" onclick="drawTable(1)">Sva bela</button>
-		<button id="black" onclick="drawTable(2)">Sva crna</button>
-		<button id="hor" onclick="drawTable(3)">Horizontalne pruge</button>
-		<button id="vert" onclick="drawTable(4)">Vertikalne pruge</button>
-		<button id="diag" onclick="drawTable(5)">Dijagonalne pruge</button>
-		<button id="chess" onclick="drawTable(6)">Šahovski raspored</button>
-		&nbsp;&nbsp;&nbsp;&nbsp;
-		<button id="inverse" onclick="inverse()">Inverzan raspored</button>
+		<ul>
+			<li>
+				<!-- dugme za prikazivanje svih belih polja tabele -->
+				<button id="white" onclick="drawTable(1)"></button>
+				<span id="white-tip" class="tip"></span>
+			</li>
+			<li>
+				<!-- dugme za prikazivanje svih crnih polja tabele -->
+				<button id="black" onclick="drawTable(2)"></button>
+				<span id="black-tip" class="tip"></span>
+			</li>
+			<li>
+				<!-- dugme za prikazivanje horizontalnih pruga -->
+				<button id="hor" onclick="drawTable(3)"></button>
+				<span id="hor-tip" class="tip"></span>
+			</li>
+			<li>
+				<!-- dugme za prikazivanje vertikalnih pruga -->
+				<button id="vert" onclick="drawTable(4)"></button>
+				<span id="vert-tip" class="tip"></span>
+			</li>
+			<li>
+				<!-- dugme za prikazivanje dijagonalnih pruga -->
+				<button id="diag" onclick="drawTable(5)"></button>
+				<span id="diag-tip" class="tip"></span>
+			</li>
+			<li>
+				<!-- dugme za prikazivanje šahovskog rasporeda -->
+				<button id="chess" onclick="drawTable(6)"></button>
+				<span id="chess-tip" class="tip"></span>
+			</li>
+			<li>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+			</li>
+			<li>
+				<!-- dugme za prikazivanje inverznog raporeda -->
+				<button id="inverse" onclick="inverse()"></button>
+				<span id="inverse-tip" class="tip"></span>
+			</li>
+		</ul>
 	</div>
+
+	<!-- treći red kontrolne table -->
 	<div class="commands2">
-		<button id="step" onclick="step()"><img src="images/step.png" width="auto" height=18 /></button>
-		&nbsp;&nbsp;
-		<button id="start" onclick="run()"><img src="images/play.png" width="auto" height=18 /></button>
-		<div id="led" class="led-off"></div>
-		&nbsp;&nbsp;&nbsp;&nbsp;
-		sporo<input id="speed" type="range" min="1" max="9" step="1" value="5" onmouseup="changeSpeed()">brzo
+		<ul>
+			<li>
+				<!-- dugme za jedan korak simulacije -->
+				<button id="step" onclick="step()">
+					<img src="images/step.png" width="auto" height=18 />
+				</button>
+				<span id="step-tip" class="tip"></span>
+			</li>
+			<li>
+				&nbsp;&nbsp;
+			</li>
+			<li>
+				<!-- dugme za startovanje/pauziranje/nastavljanje simulacije -->
+				<button id="start" onclick="run()"><img src="images/play.png" width="auto" height=18 /></button>
+				<span id="start-tip" class="tip"></span>
+			</li>
+			<li>
+				<!-- LED-dioda -->
+				<div id="led" class="led-off"></div>
+				<span id="led-tip" class="tip"></span>
+			</li>
+			<li>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+			</li>
+			<li>
+				<!-- regulator brzine simulacije -->
+				<span id="slow">sporo</span><input id="speed" type="range" min="1" max="9" step="1" value="5" onmouseup="changeSpeed()"><span id="fast">brzo</span>
+				<span id="speed-tip" class="tip"></span>
+			</li>
+			<li>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</li>
 	</div>
 </div>
 
