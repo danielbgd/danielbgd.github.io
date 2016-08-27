@@ -15,7 +15,7 @@ var fieldsArray = []; // niz u kojem se čuvaju statusi polja
 
 function init() {
 	english(); // prikazivanje natpisa i poruka na engleskom jeziku
-	drawTable(60,80,1); // formiranje tabele
+	drawTable(1); // formiranje tabele
 }
 
 function drawTable(content) { // crtanje nove tabele (prazne ili s predefinisanim sadržajem)
