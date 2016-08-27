@@ -4,6 +4,7 @@ body {
 }
 
 .container {
+	position: relative;
 	width: 850px;
 	margin-left: auto;
 	margin-right: auto;
@@ -14,10 +15,38 @@ h1 {
 	text-align: center;
 	margin-top: 16px;
 	margin-bottom: 10px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.languages {
+	position: absolute;
+	list-style-type: none;
+	right: 30px;
+	top: 0px;
+}
+
+.languages li {
+	display: inline;
+	margin-right: 5px;
+	cursor: pointer;
+}
+
+.languages li img.selected {
+	position: relative;
+	border: navy solid 2px;
+	cursor: default;
+	margin: -2px;
+}
+
+.languages li  img{
+	width: 26px;
+	height: auto;
 }
 
 table {
 	border-collapse: collapse;
+	clear: both;
 	width: auto;
 	margin-left: auto;
 	margin-right: auto;
@@ -48,7 +77,8 @@ td.dead {
 	width: 95%;
 	margin-left: auto;
 	margin-right: auto;
-	margin-bottom: 10px;
+	margin-top: -26px;
+	margin-bottom: 0px;
 }
 
 #counter {
@@ -64,6 +94,7 @@ td.dead {
 }
 
 #random {
+	position: relative;
 	white-space: nowrap;
 	text-align: right;
 	margin-top: -10px;
@@ -73,18 +104,103 @@ td.dead {
 }
 
 .commands1 {	
-	margin-top: 0px;
+	margin-top: -10px;
 	margin-bottom: 0px;
 }
 
 .commands2 {
-	margin-top: 6px;
+	margin-top: -8px;
 	margin-bottom: 0px;	
+}
+
+.counter-random ul, .commands1 ul, .commands2 ul {
+	list-style-type: none;
+	position: relative;
+	top: 0px;
+	bottom: 0px;
+}
+
+.counter-random li, .commands1 li, .commands2 li{
+	display: inline;
+	position: relative;
+	top: 0px;
+	bottom: 0px;
 }
 
 button {
 	padding: 2px;
 	font-size: 12px;
+}
+
+li .tip {
+	visibility: hidden;
+	opacity: 0;
+	width: auto;
+	background-color: #FFFFE1;
+	color: #000;
+	text-align: center;
+	border: black solid 1px;
+	border-radius: 0px;
+	padding: 2px 4px;
+	white-space: nowrap;
+	font-size: 12px;
+	text-align: left;
+	-webkit-transition-property: opacity; /* Safari */
+	-webkit-transition-duration: 0.7s; /* Safari */
+	-webkit-transition-delay: 0s; /* Safari */
+	transition-property: opacity;
+	transition-duration: 0.7s;
+	transition-delay: 0s;
+
+	/* Position the tooltip */
+	position: absolute;
+	left: 0px;
+	z-index: 1;
+	outline: none;
+}
+
+li .tip-deact {
+	display:none;
+}
+
+.counter-random li .tip {
+	bottom: 28px;
+}
+
+.commands1 li .tip {
+	bottom: 20px;
+}
+
+.commands2 li .tip {
+	bottom: 28px;
+}
+
+li:hover .tip {
+	visibility: visible;
+	opacity: 1;
+	-webkit-transition-property: opacity; /* Safari */
+	-webkit-transition-duration: 0.7s; /* Safari */
+	-webkit-transition-delay: 1s; /* Safari */
+	transition-property: opacity;
+	transition-duration: 0.7s;
+	transition-delay: 1s;
+}
+
+li:hover .tip:hover {
+	visibility: hidden;
+}
+
+li .tip ul {
+	list-style-type: disc;
+}
+
+li .tip li {
+	display: list-item;
+}
+
+.keyshort {
+	color: blue;
+	font-weight:bold;
 }
 
 button img {
