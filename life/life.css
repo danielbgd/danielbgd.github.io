@@ -19,6 +19,51 @@ h1 {
 	margin-right: auto;
 }
 
+#help {
+	display: inline-block;
+	position: absolute;
+	border: solid gray 2px;
+	border-radius: 4px;
+	background-color: #FFFFE1;
+	right: 150px;
+	top: 10px;
+	width: 25px;
+	font-size: 20px;
+	font-weight: bold;
+	cursor: default;
+}
+
+#help2 {	
+	visibility: hidden;
+	width: 760px;
+	background-color: #FFFFE1;
+	color: #000;
+	text-align: justify!important;
+	border: black solid 1px;
+	border-radius: 4px;
+	padding: 2px 4px;
+	font-size: 12px;
+	text-align: left;
+	white-space: pre-wrap;
+	padding: 0 15px;
+
+	/* Position the tooltip */
+	position: absolute;
+	right: -123px;
+	top: 26px;
+	z-index: 1;
+	outline: none;
+}
+
+#help:hover #help2 {
+	visibility: visible;
+	font-weight: normal;
+}
+
+#help2 p, #help2 ul {
+	margin: 3px;
+}
+
 .languages {
 	position: absolute;
 	list-style-type: none;
@@ -32,14 +77,14 @@ h1 {
 	cursor: pointer;
 }
 
-.languages li img.selected {
+.languages li img.selected { /* izabrana zastavica odgovarajućeg jezika */
 	position: relative;
 	border: navy solid 2px;
 	cursor: default;
 	margin: -2px;
 }
 
-.languages li  img{
+.languages li img {
 	width: 26px;
 	height: auto;
 }
@@ -50,11 +95,11 @@ table {
 	width: auto;
 	margin-left: auto;
 	margin-right: auto;
-    border: 2px solid #000;
+	border: 2px solid #000;
 }
 
-tr,td {
-    border: 1px solid #ddd;
+tr, td {
+	border: 1px solid #ddd;
 }
 
 td {
@@ -65,12 +110,20 @@ tr {
 	height: 10px
 }
 
+td.dead {
+	background-color: white;
+}
+
 td.alive {
 	background-color: black;
 }
 
-td.dead {
-	background-color: white;
+td.died {
+	background-color: #EEEE88;
+}
+
+td.revived {
+	background-color: blue;
 }
 
 .counter-random {
@@ -118,18 +171,35 @@ td.dead {
 	position: relative;
 	top: 0px;
 	bottom: 0px;
+	padding: 0px;
 }
 
-.counter-random li, .commands1 li, .commands2 li{
+.counter-random li, .commands1 li, .commands2 li {
 	display: inline;
 	position: relative;
 	top: 0px;
 	bottom: 0px;
 }
 
+.counter-random ul ul, .commands1 ul ul, .commands2 ul ul {
+	padding-left: 25px;
+}
+
 button {
-	padding: 2px;
+	padding: 2px 5px;
 	font-size: 12px;
+	min-width: 50px;
+}
+
+#changes {
+	position: relative;
+	vertical-align: middle;
+}
+
+#changes-in-color {
+	display: inline-block;
+	font-size: 12px;
+	text-align: left;
 }
 
 li .tip {
