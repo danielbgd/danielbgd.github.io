@@ -32,10 +32,15 @@
 <div class="container">
 	<h1>The Game of Life</h1>
 
+	<!-- help -->
+	<span id="help">?
+		<span id="help2"></span>
+	</span>
+	
 	<!-- izbor jezika prikaza -->
 	<ul class="languages">
-		<li><img id="eng" src="images/eng.png" onclick="english()" /></li>
-		<li><img id="srb" src="images/srb.png" onclick="serbian()" /></li>
+		<li><img id="eng" src="images/eng.png" alt="English language" title="Switch to English language" onclick="english()" /></li>
+		<li><img id="srb" src="images/srb.png" alt="Srpski jezik" title="Prebaci na srpski jezik" onclick="serbian()" /></li>
 	</ul>
 	
 	<!-- prikaz tabele -->
@@ -67,12 +72,12 @@
 	<div class="commands1">
 		<ul>
 			<li>
-				<!-- dugme za prikazivanje svih belih polja tabele -->
+				<!-- dugme za prikazivanje svih belih ćelija tabele -->
 				<button id="white" onclick="drawTable(1)"></button>
 				<span id="white-tip" class="tip"></span>
 			</li>
 			<li>
-				<!-- dugme za prikazivanje svih crnih polja tabele -->
+				<!-- dugme za prikazivanje svih crnih ćelija tabele -->
 				<button id="black" onclick="drawTable(2)"></button>
 				<span id="black-tip" class="tip"></span>
 			</li>
@@ -113,7 +118,7 @@
 			<li>
 				<!-- dugme za jedan korak simulacije -->
 				<button id="step" onclick="step()">
-					<img src="images/step.png" width="auto" height=18 />
+					<img src="images/step.png" alt="frame advance" width="auto" height=18 />
 				</button>
 				<span id="step-tip" class="tip"></span>
 			</li>
@@ -122,7 +127,7 @@
 			</li>
 			<li>
 				<!-- dugme za startovanje/pauziranje/nastavljanje simulacije -->
-				<button id="start" onclick="run()"><img src="images/play.png" width="auto" height=18 /></button>
+				<button id="start" onclick="run()"><img src="images/play.png" alt="play/pause" width="auto" height=18 /></button>
 				<span id="start-tip" class="tip"></span>
 			</li>
 			<li>
@@ -140,6 +145,11 @@
 			</li>
 			<li>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</li>
+			<li>
+				<!-- opcija da se promene prikazuju u boji -->
+				<label><input type="checkbox" id="changes" name="changes" onclick="displayNewWhileStopPause()"><span id="changes-in-color"></span></label>
+				<span id="changes-tip" class="tip"></span>
 			</li>
 	</div>
 </div>
