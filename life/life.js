@@ -12,6 +12,7 @@ var stepButton = imgFolder + "step.png"; // lokacija simbola za "FRAME ADVANCE"
 var stepButtonDisabled = imgFolder + "step-disabled.png"; // lokacija deaktiviranog simbola za "FRAME ADVANCE"
 var mode = 0; // flag radnog režima (0 – STOP; 1 – PLAY; 2 – PAUSE)
 var cellsArray = []; // niz u kojem se čuvaju statusi ćelija
+var edge = 0;
 
 function init() {
 	english(); // prikazivanje natpisa i poruka na defaultnom (engleskom, zasad) jeziku
@@ -134,25 +135,46 @@ function step() { // korak simulacije
 
 	// Prvo obrađujemo četiri ćelije na ćoškovima
 	neighbours = checkCell(2) + checkCell(n + 1) + checkCell(n + 2); // ćelija u gornjem levom uglu; prebrojavamo koliko živih ćelija ima među susedne tri ćelije
+	if(edge) {
+		neighbours += checkCell(n) + checkCell(2 * n) + checkCell((m - 1) * n + 1) + checkCell((m - 1) * n + 2) + checkCell(m * n);
+	}
 	cellsArray[1] = newStatus(1, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
-	neighbours = checkCell(n - 1) + checkCell(2 * n - 1) + checkCell(2 * n);
-	cellsArray[n] = newStatus(n, neighbours); // ćelija u gornjem desnom uglu
-	neighbours = checkCell((m - 2) * n + 1) + checkCell((m - 2) * n + 2) + checkCell((m - 1) * n + 2);
-	cellsArray[(m - 1) * n + 1] = newStatus((m - 1) * n + 1, neighbours); // ćelija u donjem levom uglu
-	neighbours = checkCell((m - 1) * n - 1) + checkCell((m - 1) * n) + checkCell(m * n - 1);
-	cellsArray[m * n] = newStatus(m * n, neighbours); // ćelija u donjem desnom uglu
+	neighbours = checkCell(n - 1) + checkCell(2 * n - 1) + checkCell(2 * n); // ćelija u gornjem desnom uglu
+	if(edge) {
+		neighbours += checkCell(1) + checkCell(n + 1) + checkCell((m - 1) * n + 1) + checkCell(m * n - 1) + checkCell(m * n);
+	}
+	cellsArray[n] = newStatus(n, neighbours);
+	neighbours = checkCell((m - 2) * n + 1) + checkCell((m - 2) * n + 2) + checkCell((m - 1) * n + 2); // ćelija u donjem levom uglu
+	if(edge) {
+		neighbours += checkCell(1) + checkCell(2) + checkCell(n) + checkCell((m - 1) * n) + checkCell(m * n);
+	}
+	cellsArray[(m - 1) * n + 1] = newStatus((m - 1) * n + 1, neighbours);
+	neighbours = checkCell((m - 1) * n - 1) + checkCell((m - 1) * n) + checkCell(m * n - 1); // ćelija u donjem desnom uglu
+	if(edge) {
+		neighbours += checkCell(1) + checkCell(n - 1) + checkCell(n) + checkCell((m - 2) * n + 1) + checkCell((m - 1) * n + 1);
+	}
+	cellsArray[m * n] = newStatus(m * n, neighbours);
 
 	// Obrađujemo prvi (gornji) red (bez ugaonih ćelija)
+	var cell = (m - 1) * n;
 	for (i = 2; i <= n-1; i++) {
 		neighbours = checkCell(i - 1) + checkCell(i + 1) + checkCell(n + i - 1) + checkCell(n + i) + checkCell(n + i + 1); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija
+		if(edge) {
+			neighbours += checkCell(cell + i - 1) + checkCell(cell + i) + checkCell(cell + i + 1);
+		}
 		cellsArray[i] = newStatus(i, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
 	}
 
 	// Obrađujemo poslednji (donji) red (bez ugaonih ćelija)
 	var start = (m - 1) * n + 2; // redni broj ćelije koja je prva desno od ćelije u donjem levom uglu
 	var end = m * n - 1; // redni broj ćelije koja je prva levo od ćelije u donjem desnom uglu
+	var cell = 1;
 	for (i = start; i <= end; i++) {
+		cell++;
 		neighbours=checkCell(i - 1) + checkCell(i + 1) + checkCell(i - 1 - n) + checkCell(i - n) + checkCell(i + 1 - n); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija
+		if(edge) {
+			neighbours += checkCell(cell - 1) + checkCell(cell) + checkCell(cell + 1);
+		}
 		cellsArray[i] = newStatus(i, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
 	}
 
@@ -162,11 +184,17 @@ function step() { // korak simulacije
 		// Prvo ćelije koje su uz levu ivicu tabele
 		k = (i - 1) * n + 1; // redni broj posmatrane ćelije koja se nalazi uz levu ivicu tabele
 		neighbours = checkCell(k - n) + checkCell(k - n + 1) + checkCell(k + 1) + checkCell(k + n) + checkCell(k + n + 1); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija
+		if(edge) {
+			neighbours += checkCell(k - 1) + checkCell(k + n - 1) + checkCell(k + 2 * n - 1);
+		}
 		cellsArray[k] = newStatus(k, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
 
 		// Zatim ćelije koje su uz desnu ivicu tabele
 		k = i * n; // redni broj posmatrane ćelije koja se nalazi uz desnu ivicu tabele
 		neighbours = checkCell(k - n) + checkCell(k - n - 1) + checkCell(k - 1) + checkCell(k + n - 1) + checkCell(k + n); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija
+		if(edge) {
+			neighbours += checkCell(k - 2 * n + 1) + checkCell(k - n + 1) + checkCell(k + 1);
+		}
 		cellsArray[k] = newStatus(k, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
 
 		// Zatim sve ostale ćelije u trenutnom redu (od drugog do pretposlednjeg, sleva nadesno)
@@ -264,11 +292,15 @@ function ledBlink() { // treperenje LED-diode u režimu „PAUSE“
 	}
 }
 
-function changeSpeed () { // promena brzine u toku simulacije
+function changeSpeed() { // promena brzine u toku simulacije
 	if (mode == 1) { // izvršava se jedino u režimu „PLAY“
 		clearInterval(runLoop); // prekida se dosadašnja radna petlja...
 		setSpeed(); // ...i startuje nova, s novopodešenom brzinom
 	}
+}
+
+function changeEdgeMode(newEdge) { // 
+	edge = newEdge;
 }
 
 // ispunjavanje niza natpisima i porukama na engleskom jeziku
@@ -293,6 +325,7 @@ function english() {
 	langArray["slow"] = "slow";
 	langArray["fast"] = "fast";
 	langArray["changes in color"] = "Status changes<br />are displayed in color";
+	langArray["edge"] = "Table edges behavior";
 	
 	// poruke
 	langArray["random tip"] = "Regulator for the black (alive)<br />cells density in the initial step.<ul><li>Leftmost position – minimal density;</li><li>Rightmost position – maximal density;</li></ul>Keyboard shortcuts: <span class='keyshort'>1–9</span><ul><li>key 1 – minimal density</li><li>key 9 – maximal density</li></ul>";
@@ -309,10 +342,11 @@ function english() {
 	langArray["cont tip"] = "Continues the simulation.<br />Keyboard shortcut: <span class='keyshort'>C</span>";
 	langArray["led tip"] = 'Mode LED-indicator:<ul><li>off: "STOP" mode</li><li>on: "PLAY" mode</li><li>blinking: "PAUSE" mode</li></ul>';
 	langArray["speed tip"] = "Simulation speed regulator:<ul><li>Leftmost position – minimal speed</li><li>Rightmost position – maximal speed</li></ul>Keyboard shortcuts:<br /><ul><li><span class='keyshort'>N</span> (reduces speed)</li><li><span class='keyshort'>M</span> (increase speed)</li></ul>";
-	langArray["changes tip"] = "When unchecked, the cells<br />are displayed in two colors:<ul><li>black: alive</li><li>white: dead</li></ul>Checking this option<br />adds two more colors:<ul><li>blue: the cell has just revived</li><li>yellow: the cell has just died</li></ul>Keyboard shortcut: <span class='keyshort'>L</span>";
+	langArray["changes tip"] = "When unchecked, the cells are<br />displayed in two colors:<ul><li>black: alive</li><li>white: dead</li></ul>Checking this option adds two<br />more colors:<ul><li>blue: the cell has just revived</li><li>yellow: the cell has just died</li></ul>Keyboard shortcut: <span class='keyshort'>K</span>";
+	langArray["edge tip"] = "The way cells located on the edges<br />of the table behave:<ul><li>mode 1: the table edges act like<br />real, physical walls – there's no<br />anything behind them;</li><li>mode 2: behind the right edge<br />there's the left edge of the table,<br />behind the bottom edge there's<br />the top edge of the table and<br />so on. In other words, the table<br />can be observed as a surface of<br />the sphere, whereby it's right<br />edge is joined with the left edge,<br />likewise the bottom with the top<br />edge.</li></ul>Keyboard shortcut: <span class='keyshort'>L</span>";
 	
 	// help
-	langArray["help"] = "<p>The Game of Life is a very popular game demonstrating how it's possible to obtain ordered structures from an initial chaos, when a few simple rules are obeyed.</p><p>The main object in this game is a table consisting of alive (black) and dead (white) cells, whereby each cell is surrounded by eight other (living or dead) cells. At the very beginning, we arrange the alive and dead cells in a desired, arbitrary way. Some of the predefined layouts can be obtained using the available buttons (All whites, All blacks...), combining with activating/deactivating some cells with the left mouse button, which makes it possible to manualy draw some objects. There is, also, an option of generating a random layout (with the random slider).</p><p>After setting up the table, the simulation can be run in two ways – by going step by step pressing the "+'"'+"one-step"+'"'+" button for every new simulation step, or by pressing the "+'"'+"start"+'"'+" button which runs the automated simulation.</p><p>The rules the simulation is based on are the following:<ul><li>if a cell is surrounded by less than two alive cells, or is surrounded by more than three alive cells, in the next step it's dead due to the loneliness (in the first case), or due to the overpopulation (in the second case);</li><li>if a cell is surrounded by exactly two alive cells, in the next step it doesn't change its status (the alive cell stays alive, the dead cell stays dead);</li><li>if a cell is surrounded by exactly three alive cells, in the next step it's alive.</li></ul><p>Or, from the standpoint of cell's survival, these rules can be formulated in a slightly different form:</p><ul><li>if a cell is dead, in the next step it becomes alive if and only if it's surrounded by exactly three alive cells;</li><li>if a cell is alive, in the next step it stays alive if and only if it's surrounded by exactly two or by exactly three alive cells.</li></ul></p><p>Keyboard shortcuts:</p><ul>Populating the table with predefined content:<li><span class='keyshort'>1–9</span> – random layout – 1 is for the minimal density, 9 is for the maximal density;</li><li><span class='keyshort'>A</span> – all white cells;</li><li><span class='keyshort'>S</span> – all black cells;</li><li><span class='keyshort'>D</span> – a form of horizontal bars;</li><li><span class='keyshort'>F</span> – a form of vertical bars;</li><li><span class='keyshort'>G</span> – a form of diagonal bars;</li><li><span class='keyshort'>H</span> – a chess-shaped form;</li><li><span class='keyshort'>I</span> – making the inverse of the current layout.</li></ul><ul>Commands:<li><span class='keyshort'>X</span> – one simulation step;</li><li><span class='keyshort'>C</span> – running/pausing the simulation;</li><li><span class='keyshort'>N</span> – slowing down the simulation running;</li><li><span class='keyshort'>M</span> – accelerating the simulation running.</li><li><span class='keyshort'>L</span> – status changes are displayed in color.</li></ul><p>A detailed description of a particular option can be seen by hovering a button/regulator/checkbox for that option.</p>";
+	langArray["help"] = "<p>The Game of Life is a very popular game demonstrating how it's possible to obtain ordered structures from an initial chaos, when a few simple rules are obeyed.</p><p>The main object in this game is a table consisting of alive (black) and dead (white) cells, whereby each cell is surrounded by eight other (living or dead) cells. At the very beginning, we arrange the alive and dead cells in a desired, arbitrary way. Some of the predefined layouts can be obtained using the available buttons (All whites, All blacks...), combining with activating/deactivating some cells with the left mouse button, which makes it possible to manualy draw some objects. There is, also, an option of generating a random layout (with the random slider).</p><p>After setting up the table, the simulation can be run in two ways – by going step by step pressing the "+'"'+"one-step"+'"'+" button for every new simulation step, or by pressing the "+'"'+"start"+'"'+" button which runs the automated simulation.</p><p>The rules the simulation is based on are the following:<ul><li>if a cell is surrounded by less than two alive cells, or is surrounded by more than three alive cells, in the next step it's dead due to the loneliness (in the first case), or due to the overpopulation (in the second case);</li><li>if a cell is surrounded by exactly two alive cells, in the next step it doesn't change its status (the alive cell stays alive, the dead cell stays dead);</li><li>if a cell is surrounded by exactly three alive cells, in the next step it's alive.</li></ul><p>Or, from the standpoint of cell's survival, these rules can be formulated in a slightly different form:</p><ul><li>if a cell is dead, in the next step it becomes alive if and only if it's surrounded by exactly three alive cells;</li><li>if a cell is alive, in the next step it stays alive if and only if it's surrounded by exactly two or by exactly three alive cells.</li></ul></p><p>Keyboard shortcuts:</p><ul>Populating the table with predefined content:<li><span class='keyshort'>1–9</span> – random layout – 1 is for the minimal density, 9 is for the maximal density;</li><li><span class='keyshort'>A</span> – all white cells;</li><li><span class='keyshort'>S</span> – all black cells;</li><li><span class='keyshort'>D</span> – a form of horizontal bars;</li><li><span class='keyshort'>F</span> – a form of vertical bars;</li><li><span class='keyshort'>G</span> – a form of diagonal bars;</li><li><span class='keyshort'>H</span> – a chess-shaped form;</li><li><span class='keyshort'>I</span> – making the inverse of the current layout.</li></ul><ul>Commands:<li><span class='keyshort'>X</span> – one simulation step;</li><li><span class='keyshort'>C</span> – running/pausing the simulation;</li><li><span class='keyshort'>N</span> – slowing down the simulation running;</li><li><span class='keyshort'>M</span> – accelerating the simulation running;</li><li><span class='keyshort'>K</span> – status changes are displayed in color;</li><li><span class='keyshort'>L</span> – table edges behavior.</li></ul><p>A detailed description of a particular option can be seen by hovering a button/regulator/checkbox for that option.</p>";
 	
 	document.getElementById("eng").className = "selected"; // simbol izabranog jezika treba da bude uokviren i da na njemu kursor miša bude default
 	document.getElementById("srb").className = ""; // simbol neizabranog jezika treba da bude neuokviren i da na njemu kursor miša bude pointer
@@ -341,6 +375,7 @@ function serbian() {
 	langArray["slow"] = "sporo";
 	langArray["fast"] = "brzo";
 	langArray["changes in color"] = "Promene statusa se<br />prikazuju u boji";
+	langArray["edge"] = "Ponašanje ivica tabele";
 	
 	// poruke
 	langArray["random tip"] = "Regulator gustine crnih (živih) ćelija<br />u početnom koraku.<ul><li>Krajnji levi položaj – najmanja gustina;</li><li>Krajnji desni položaj – najveća gustina;</li></ul>Prečice na tastaturi: <span class='keyshort'>1–9</span><ul><li>taster 1 – najmanja gustina</li><li>taster 9 – najveća gustina</li></ul>";
@@ -357,10 +392,11 @@ function serbian() {
 	langArray["cont tip"] = "Nastavljanje simulacije.<br />Prečica na tastaturi: <span class='keyshort'>C</span>";
 	langArray["led tip"] = "Indikator režima rada:<ul><li>isključeno: režim „STOP“</li><li>uključeno: režim „PLAY“</li><li>treperenje: režim „PAUSE“</li></ul>";
 	langArray["speed tip"] = "Regulator brzine simulacije:<ul><li>Krajnji levi položaj – najmanja brzina</li><li>Krajnji desni položaj – najveća brzina</li></ul>Prečice na tastaturi:<br /><ul><li><span class='keyshort'>N</span> (smanjivanje brzine)</li><li><span class='keyshort'>M</span> (povećavanje brzine)</li></ul>";
-	langArray["changes tip"] = "Kada je ova opcija isključena,<br />ćelije se prikazuju u dve boje:<ul><li>crna: živa</li><li>bela: mrtva</li></ul>Uključenjem ove opcije<br />dodaju se dve nove boje:<ul><li>plava: ćelija je upravo oživela</li><li>žuta: ćelija je upravo umrla</li></ul>Prečica na tastaturi: <span class='keyshort'>L</span>";
+	langArray["changes tip"] = "Kada je ova opcija isključena,<br />ćelije se prikazuju u dve boje:<ul><li>crna: živa</li><li>bela: mrtva</li></ul>Uključenjem ove opcije dodaju se<br />dve nove boje:<ul><li>plava: ćelija je upravo oživela</li><li>žuta: ćelija je upravo umrla</li></ul>Prečica na tastaturi: <span class='keyshort'>K</span>";
+	langArray["edge tip"] = "Način na koji se ponašaju ćelije<br />locirane na ivicama tabele:<ul><li>mode 1: ivice tabele se ponašaju<br />kao pravi, fizički zidovi – ne postoji<br />ništa iza njih;</li><li>mode 2: iza desne ivice nalazi se<br />leva ivica tabele, iza donje ivice<br />nalazi se gornja ivica tabele itd.<br />Drugim rečima, tabela se može<br />posmatrati kao površina sfere,<br />pri čemu je njena desna ivica<br />spojena s desnom ivicom, isto<br />tako donja s gornjom ivicom.</li></ul>Prečica na tastaturi: <span class='keyshort'>L</span>";
 	
 	// help
-	langArray["help"] = "<p>Igra života je veoma popularna igra koja demonstrira kako je moguće iz početnog haosa dobiti uređene strukture, kada je ispunjeno nekoliko jednostavnih pravila.</p><p>Glavni objekt ove igre je tabela koja se sastoji od živih (crnih) i mrtvih (belih) ćelija, pri čemu je svaka ćelija okružena sa osam drugih (živih ili mrtvih) ćelija. Na samom početku, raspoređujemo žive i mrtve ćelije na željen, proizvoljan način. Neki od predefinisanih rasporeda mogu se postići upotrebom dostupnih dugmeta (Sve bele, Sve crne...), u kombinaciji s aktiviranjem/deaktiviranjem nekih ćelija levim klikom miša, čime je omogućeno ručno crtanje nekih objekata. Postoji, takođe, opcija generisanja random rasporeda (pomoću random klizača).</p><p>Nakon postavljanja tabele, simulacija se može izvršiti na dva načina – idući korak po korak pritiskanjem „one-step“ dugmeta za svaki novi korak simulacije, ili pritiskom na „start“ dugme čime se pokreće automatizovana simulacija.</p><p>Pravila po kojima se simulacija izvršava jesu sledeća:<ul><li>ako je ćelija okružena s manje od dve žive ćelije, ili je okružena s više od tri žive ćelije, u sledećem koraku ona je mrtva usled usamljenosti (u prvom slučaju), ili usled prenaseljenosti (u drugom slučaju);</li><li>ako je ćelija okružena s tačno dve žive ćelije, u sledećem koraku ne menja svoj status (živa ćelija ostaje živa, mrtva ćelija ostaje mrtva);</li><li>ako je ćelija okružena s tačno tri žive ćelije, u sledećem koraku ona je živa.</li></ul><p>Ili, sa stanovišta opstanka ćelije, ova pravila se mogu formulisati u nešto drugačijem obliku:</p><ul><li>ako je ćelija mrtva, u sledećem koraku ona oživljava ako i samo ako je okružena s tačno tri žive ćelije;</li><li>ako je ćelija živa, u sledećem koraku ona ostaje živa ako i samo ako je okružena s tačno dve ili s tačno tri žive ćelije.</li></ul></p><p>Prečice na tastaturi:</p><ul>Popunjavanje tabele predefinisanim sadržajem:<li><span class='keyshort'>1–9</span> – random raspored – 1 je za najmanju gustinu, 9 je za najveću gustinu;</li><li><span class='keyshort'>A</span> – sve bele ćelije;</li><li><span class='keyshort'>S</span> – sve crne ćelije;</li><li><span class='keyshort'>D</span> – raspored u vidu horizontalnih pruga;</li><li><span class='keyshort'>F</span> – raspored u vidu vertikalnih pruga;</li><li><span class='keyshort'>G</span> – raspored u vidu dijagonalnih pruga;</li><li><span class='keyshort'>H</span> – raspored u vidu šahovskih polja;</li><li><span class='keyshort'>I</span> – pravljenje inverznog rasporeda u odnosu na trenutni.</li></ul><ul>Komande:<li><span class='keyshort'>X</span> – jedan korak simulacije;</li><li><span class='keyshort'>C</span> – pokretanje/pauziranje simulacije;</li><li><span class='keyshort'>N</span> – usporavanje simulacije;</li><li><span class='keyshort'>M</span> – ubrzavanje simulacije.</li><li><span class='keyshort'>L</span> – promene statusa se prikazuju u boji.</li></ul><p>Detaljan opis svake opcije može se videti prelaskom kursora miša preko dugmeta/regulatora/checkboxa za tu opciju.</p>";
+	langArray["help"] = "<p>Igra života je veoma popularna igra koja demonstrira kako je moguće iz početnog haosa dobiti uređene strukture, kada je ispunjeno nekoliko jednostavnih pravila.</p><p>Glavni objekt ove igre je tabela koja se sastoji od živih (crnih) i mrtvih (belih) ćelija, pri čemu je svaka ćelija okružena sa osam drugih (živih ili mrtvih) ćelija. Na samom početku, raspoređujemo žive i mrtve ćelije na željen, proizvoljan način. Neki od predefinisanih rasporeda mogu se postići upotrebom dostupnih dugmeta (Sve bele, Sve crne...), u kombinaciji s aktiviranjem/deaktiviranjem nekih ćelija levim klikom miša, čime je omogućeno ručno crtanje nekih objekata. Postoji, takođe, opcija generisanja random rasporeda (pomoću random klizača).</p><p>Nakon postavljanja tabele, simulacija se može izvršiti na dva načina – idući korak po korak pritiskanjem „one-step“ dugmeta za svaki novi korak simulacije, ili pritiskom na „start“ dugme čime se pokreće automatizovana simulacija.</p><p>Pravila po kojima se simulacija izvršava jesu sledeća:<ul><li>ako je ćelija okružena s manje od dve žive ćelije, ili je okružena s više od tri žive ćelije, u sledećem koraku ona je mrtva usled usamljenosti (u prvom slučaju), ili usled prenaseljenosti (u drugom slučaju);</li><li>ako je ćelija okružena s tačno dve žive ćelije, u sledećem koraku ne menja svoj status (živa ćelija ostaje živa, mrtva ćelija ostaje mrtva);</li><li>ako je ćelija okružena s tačno tri žive ćelije, u sledećem koraku ona je živa.</li></ul><p>Ili, sa stanovišta opstanka ćelije, ova pravila se mogu formulisati u nešto drugačijem obliku:</p><ul><li>ako je ćelija mrtva, u sledećem koraku ona oživljava ako i samo ako je okružena s tačno tri žive ćelije;</li><li>ako je ćelija živa, u sledećem koraku ona ostaje živa ako i samo ako je okružena s tačno dve ili s tačno tri žive ćelije.</li></ul></p><p>Prečice na tastaturi:</p><ul>Popunjavanje tabele predefinisanim sadržajem:<li><span class='keyshort'>1–9</span> – random raspored – 1 je za najmanju gustinu, 9 je za najveću gustinu;</li><li><span class='keyshort'>A</span> – sve bele ćelije;</li><li><span class='keyshort'>S</span> – sve crne ćelije;</li><li><span class='keyshort'>D</span> – raspored u vidu horizontalnih pruga;</li><li><span class='keyshort'>F</span> – raspored u vidu vertikalnih pruga;</li><li><span class='keyshort'>G</span> – raspored u vidu dijagonalnih pruga;</li><li><span class='keyshort'>H</span> – raspored u vidu šahovskih polja;</li><li><span class='keyshort'>I</span> – pravljenje inverznog rasporeda u odnosu na trenutni.</li></ul><ul>Komande:<li><span class='keyshort'>X</span> – jedan korak simulacije;</li><li><span class='keyshort'>C</span> – pokretanje/pauziranje simulacije;</li><li><span class='keyshort'>N</span> – usporavanje simulacije;</li><li><span class='keyshort'>M</span> – ubrzavanje simulacije;</li><li><span class='keyshort'>K</span> – promene statusa se prikazuju u boji;</li><li><span class='keyshort'>L</span> – ponašanje ivica tabele.</li></ul><p>Detaljan opis svake opcije može se videti prelaskom kursora miša preko dugmeta/regulatora/checkboxa za tu opciju.</p>";
 	
 	document.getElementById("srb").className = "selected"; // simbol izabranog jezika treba da bude uokviren i da na njemu kursor miša bude default
 	document.getElementById("eng").className = ""; // simbol neizabranog jezika treba da bude neuokviren i da na njemu kursor miša bude pointer
@@ -388,6 +424,7 @@ function writeLang() { // prikazivanje natpisa i poruka na izabranom jeziku, na 
 	document.getElementById("slow").innerHTML = langArray["slow"];
 	document.getElementById("fast").innerHTML = langArray["fast"];
 	document.getElementById("changes-in-color").innerHTML = langArray["changes in color"];
+	document.getElementById("edge").getElementsByTagName("span")[0].innerHTML = langArray["edge"];
 	
 	// poruke
 	document.getElementById("random-tip").innerHTML = langArray["random tip"];
@@ -413,6 +450,7 @@ function writeLang() { // prikazivanje natpisa i poruka na izabranom jeziku, na 
 	document.getElementById("led-tip").innerHTML = langArray["led tip"];
 	document.getElementById("speed-tip").innerHTML = langArray["speed tip"];
 	document.getElementById("changes-tip").innerHTML = langArray["changes tip"];
+	document.getElementById("edge-tip").innerHTML = langArray["edge tip"];
 	
 	//help
 	document.getElementById("help2").innerHTML = langArray["help"];
@@ -519,13 +557,24 @@ function key(event) {
 			run();
 			document.getElementById("start").focus(); // stavljanje fokusa na odgovarajuće dugme
 			break;
-		case 108: // taster „L“ za pokretanje/pauziranje simulacije
-			if(document.getElementById("changes").checked == true) {
+		case 107: // taster „K“ za pokretanje/pauziranje simulacije
+			if(document.getElementById("changes").checked) {
 				document.getElementById("changes").checked = false;
 			} else {
 				document.getElementById("changes").checked = true;
 			}
 			document.getElementById("changes").focus(); // stavljanje fokusa na odgovarajuće dugme
+			displayNewWhileStopPause();
+			break;
+		case 108: // taster „L“ za izbor ponašanja ivica tabele
+			if(edge) { // ako je bilo postavljeno na mode 1, prebaciti na mode 0
+				document.getElementById("edge1").checked = true; // odabir odgovarajučeg radio-buttona
+				document.getElementById("edge1").focus(); // stavljanje fokusa na odgovarajuće dugme
+			} else { // u suprotnom (ako je bilo postavljeno na mode 0), prebaciti na mode 1
+				document.getElementById("edge2").checked = true; // odabir odgovarajučeg radio-buttona
+				document.getElementById("edge2").focus(); // stavljanje fokusa na odgovarajuće dugme
+			}
+			edge = 1 - edge;
 			displayNewWhileStopPause();
 			break;
 	}
