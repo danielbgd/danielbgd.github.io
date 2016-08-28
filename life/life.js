@@ -100,7 +100,7 @@ function changeCell(x) { // promena statusa ćelije pod rednim brojem x – ako 
 	} else {
 		document.getElementById(x).className = 'alive';
 	}
-	cellsArray[i] = 1 - (cellsArray[i] % 2); // promena vrednosti trenutnog člana niza – ako je bio 0 (mrtvo) ili 2 (upravo umrlo), dobija vrednost 1 (živo); ako je bio 1 (živo) ili 3 (upravo oživljeno), dobija vrednost 0 (mrtvo)
+	cellsArray[x] = 1 - (cellsArray[x] % 2); // promena vrednosti trenutnog člana niza – ako je bio 0 (mrtvo) ili 2 (upravo umrlo), dobija vrednost 1 (živo); ako je bio 1 (živo) ili 3 (upravo oživljeno), dobija vrednost 0 (mrtvo)
 }
 
 function inverse() { // zamena svih živih ćelija mrtvima i obratno
