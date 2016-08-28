@@ -193,13 +193,26 @@ button {
 
 #changes {
 	position: relative;
-	vertical-align: middle;
 }
 
 #changes-in-color {
 	display: inline-block;
-	font-size: 12px;
 	text-align: left;
+}
+
+#edge {
+	position: relative;
+	display: inline-block;
+	left: 20px;
+	top: 4px;
+}
+
+#edge label {
+	margin: 0 4px;
+}
+
+#changes-in-color, #edge {
+	font-size: 12px;
 }
 
 li .tip {
