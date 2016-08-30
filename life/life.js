@@ -132,74 +132,65 @@ function newStatus(x, neighbours) { // vrednost funkcije predstavlja novi status
 
 function step() { // korak simulacije
 	var neighbours; // varijabla koja pokazuje koliko trenutna ćelija ima živih suseda
+	var doubleN = 2 * n; // privremena varijabla koja sadrži dvostruku vrednost broja kolona; uvedena radi optimizacije algoritma, budući da se ta vrednost često ponavlja u operacijama
+	var pSubN = p - n; // privremena varijabla koja sadrži redni broj poslednje ćelije u pretposlednjem redu tabele; uvedena radi optimizacije algoritma, budući da se ta vrednost često ponavlja u operacijama
 
 	// Prvo obrađujemo četiri ćelije na ćoškovima
-	neighbours = checkCell(2) + checkCell(n + 1) + checkCell(n + 2); // ćelija u gornjem levom uglu; prebrojavamo koliko živih ćelija ima među susedne tri ćelije
-	if(edge) {
-		neighbours += checkCell(n) + checkCell(2 * n) + checkCell((m - 1) * n + 1) + checkCell((m - 1) * n + 2) + checkCell(m * n);
-	}
+
+	// ćelija u gornjem levom uglu
+	neighbours = checkCell(2) + checkCell(n + 1) + checkCell(n + 2) + edge * (checkCell(n) + checkCell(doubleN) + checkCell(pSubN + 1) + checkCell(pSubN + 2) + checkCell(p)); // prebrojavamo koliko živih ćelija ima među susedne tri ćelije; ako je edge=1 (tj. odabran mode 2 za ivice tabele), dodati još i statuse odgovarajućih pet ćelija na ostalim uglovima tabele
 	cellsArray[1] = newStatus(1, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
-	neighbours = checkCell(n - 1) + checkCell(2 * n - 1) + checkCell(2 * n); // ćelija u gornjem desnom uglu
-	if(edge) {
-		neighbours += checkCell(1) + checkCell(n + 1) + checkCell((m - 1) * n + 1) + checkCell(m * n - 1) + checkCell(m * n);
-	}
-	cellsArray[n] = newStatus(n, neighbours);
-	neighbours = checkCell((m - 2) * n + 1) + checkCell((m - 2) * n + 2) + checkCell((m - 1) * n + 2); // ćelija u donjem levom uglu
-	if(edge) {
-		neighbours += checkCell(1) + checkCell(2) + checkCell(n) + checkCell((m - 1) * n) + checkCell(m * n);
-	}
-	cellsArray[(m - 1) * n + 1] = newStatus((m - 1) * n + 1, neighbours);
-	neighbours = checkCell((m - 1) * n - 1) + checkCell((m - 1) * n) + checkCell(m * n - 1); // ćelija u donjem desnom uglu
-	if(edge) {
-		neighbours += checkCell(1) + checkCell(n - 1) + checkCell(n) + checkCell((m - 2) * n + 1) + checkCell((m - 1) * n + 1);
-	}
-	cellsArray[m * n] = newStatus(m * n, neighbours);
+
+	// ćelija u gornjem desnom uglu
+	neighbours = checkCell(n - 1) + checkCell(doubleN - 1) + checkCell(doubleN) + edge * (checkCell(1) + checkCell(n + 1) + checkCell(pSubN + 1) + checkCell(p - 1) + checkCell(p)); // prebrojavamo koliko živih ćelija ima među susedne tri ćelije; ako je edge=1 (tj. odabran mode 2 za ivice tabele), dodati još i statuse odgovarajućih pet ćelija na ostalim uglovima tabele
+	cellsArray[n] = newStatus(n, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
+
+	// ćelija u donjem levom uglu
+	neighbours = checkCell(p - doubleN + 1) + checkCell(p - doubleN + 2) + checkCell(pSubN + 2) + edge * (checkCell(1) + checkCell(2) + checkCell(n) + checkCell(pSubN) + checkCell(p)); // prebrojavamo koliko živih ćelija ima među susedne tri ćelije; ako je edge=1 (tj. odabran mode 2 za ivice tabele), dodati još i statuse odgovarajućih pet ćelija na ostalim uglovima tabele
+	cellsArray[pSubN + 1] = newStatus(pSubN + 1, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
+
+	// ćelija u donjem desnom uglu
+	neighbours = checkCell(pSubN - 1) + checkCell(pSubN) + checkCell(p - 1) + edge * (checkCell(1) + checkCell(n - 1) + checkCell(n) + checkCell(p - doubleN + 1) + checkCell(pSubN + 1)); // prebrojavamo koliko živih ćelija ima među susedne tri ćelije; ako je edge=1 (tj. odabran mode 2 za ivice tabele), dodati još i statuse odgovarajućih pet ćelija na ostalim uglovima tabele
+	cellsArray[p] = newStatus(p, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
 
 	// Obrađujemo prvi (gornji) red (bez ugaonih ćelija)
-	var cell = (m - 1) * n;
-	for (i = 2; i <= n-1; i++) {
-		neighbours = checkCell(i - 1) + checkCell(i + 1) + checkCell(n + i - 1) + checkCell(n + i) + checkCell(n + i + 1); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija
-		if(edge) {
-			neighbours += checkCell(cell + i - 1) + checkCell(cell + i) + checkCell(cell + i + 1);
-		}
+	for (i = 2; i <= n - 1; i++) {
+		neighbours = checkCell(i - 1) + checkCell(i + 1) + checkCell(n + i - 1) + checkCell(n + i) + checkCell(n + i + 1) + edge * (checkCell(pSubN + i - 1) + checkCell(pSubN + i) + checkCell(pSubN + i + 1)); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija; ako je edge=1 (tj. odabran mode 2 za ivice tabele), dodati još i statuse odgovarajuće tri ćelije na donjoj ivici tabele
 		cellsArray[i] = newStatus(i, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
 	}
 
 	// Obrađujemo poslednji (donji) red (bez ugaonih ćelija)
-	var start = (m - 1) * n + 2; // redni broj ćelije koja je prva desno od ćelije u donjem levom uglu
-	var end = m * n - 1; // redni broj ćelije koja je prva levo od ćelije u donjem desnom uglu
+	var start = pSubN + 2; // redni broj ćelije koja je prva desno od ćelije u donjem levom uglu
+	var end = p - 1; // redni broj ćelije koja je prva levo od ćelije u donjem desnom uglu
 	var cell = 1;
 	for (i = start; i <= end; i++) {
 		cell++;
-		neighbours=checkCell(i - 1) + checkCell(i + 1) + checkCell(i - 1 - n) + checkCell(i - n) + checkCell(i + 1 - n); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija
-		if(edge) {
-			neighbours += checkCell(cell - 1) + checkCell(cell) + checkCell(cell + 1);
-		}
+		neighbours=checkCell(i - 1) + checkCell(i + 1) + checkCell(i - 1 - n) + checkCell(i - n) + checkCell(i + 1 - n) + edge * (checkCell(cell - 1) + checkCell(cell) + checkCell(cell + 1)); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija; ako je edge=1 (tj. odabran mode 2 za ivice tabele), dodati još i statuse odgovarajuće tri ćelije na gornjoj ivici tabele
 		cellsArray[i] = newStatus(i, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
 	}
 
 	// Sada obrađujemo sve preostale redove – od drugog pa do pretposlednjeg
-	for (i = 2; i <= m-1; i++) { // dakle, petlja od drugog do pretposlednjeg reda
+	var above; // varijabla koja će označavati redni broj ćelije iznad posmatrane
+	var under; // varijabla koja će označavati redni broj ćelije ispod posmatrane
+	for (i = 2; i <= m - 1; i++) { // dakle, petlja od drugog do pretposlednjeg reda
 
 		// Prvo ćelije koje su uz levu ivicu tabele
 		k = (i - 1) * n + 1; // redni broj posmatrane ćelije koja se nalazi uz levu ivicu tabele
-		neighbours = checkCell(k - n) + checkCell(k - n + 1) + checkCell(k + 1) + checkCell(k + n) + checkCell(k + n + 1); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija
-		if(edge) {
-			neighbours += checkCell(k - 1) + checkCell(k + n - 1) + checkCell(k + 2 * n - 1);
-		}
+		above = k - n; // redni broj ćelije koja se nalazi odmah iznad posmatrane
+		under = k + n; // redni broj ćelije koja se nalazi odmah ispod posmatrane
+		neighbours = checkCell(above) + checkCell(above + 1) + checkCell(k + 1) + checkCell(under) + checkCell(under + 1) + edge * (checkCell(k - 1) + checkCell(under - 1) + checkCell(under + n - 1)); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija; ako je edge=1 (tj. odabran mode 2 za ivice tabele), dodati još i statuse odgovarajuće tri ćelije na desnoj ivici tabele
 		cellsArray[k] = newStatus(k, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
 
 		// Zatim ćelije koje su uz desnu ivicu tabele
 		k = i * n; // redni broj posmatrane ćelije koja se nalazi uz desnu ivicu tabele
-		neighbours = checkCell(k - n) + checkCell(k - n - 1) + checkCell(k - 1) + checkCell(k + n - 1) + checkCell(k + n); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija
-		if(edge) {
-			neighbours += checkCell(k - 2 * n + 1) + checkCell(k - n + 1) + checkCell(k + 1);
-		}
+		above = k - n; // redni broj ćelije koja se nalazi odmah iznad posmatrane
+		under = k + n; // redni broj ćelije koja se nalazi odmah ispod posmatrane
+		neighbours = checkCell(above) + checkCell(above - 1) + checkCell(k - 1) + checkCell(under - 1) + checkCell(under) + edge * (checkCell(above - n + 1) + checkCell(above + 1) + checkCell(k + 1)); // prebrojavamo koliko živih ćelija ima među susednih pet ćelija; ako je edge=1 (tj. odabran mode 2 za ivice tabele), dodati još i statuse odgovarajuće tri ćelije na levoj ivici tabele
 		cellsArray[k] = newStatus(k, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
 
 		// Zatim sve ostale ćelije u trenutnom redu (od drugog do pretposlednjeg, sleva nadesno)
-		for (j = 2; j <= n-1; j++) {
-			k=(i - 1) * n + j; // redni broj posmatrane ćelije
+		for (j = 2; j <= n - 1; j++) {
+			k = (i - 1) * n + j; // redni broj posmatrane ćelije
 			neighbours = checkCell(k - n - 1) + checkCell(k - n) + checkCell(k - n + 1) + checkCell(k - 1) + checkCell(k + 1) + checkCell(k + n - 1) + checkCell(k + n) + checkCell(k + n + 1); // prebrojavamo koliko živih ćelija ima među susednih osam ćelija
 		cellsArray[k] = newStatus(k, neighbours); // novi status ćelije smešta se u odgovarajući član globalnog niza
 		}
