@@ -156,6 +156,10 @@ td.revived {
 	width: 60%;
 }
 
+#density, #speed {
+	cursor: pointer;
+}
+
 .commands1 {	
 	margin-top: -10px;
 	margin-bottom: 0px;
