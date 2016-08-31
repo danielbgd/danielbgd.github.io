@@ -118,8 +118,15 @@
 	<div class="commands2">
 		<ul>
 			<li>
+				<!-- dugme za prethodni korak simulacije -->
+				<button id="step-rev" onclick="stepRev()">
+					<img src="images/step-rev-disabled.png" alt="previous frame" width="auto" height=18 />
+				</button>
+				<span id="step-rev-tip" class="tip"></span>
+			</li>
+			<li>
 				<!-- dugme za jedan korak simulacije -->
-				<button id="step" onclick="step()">
+				<button id="step" onclick="oneStep()">
 					<img src="images/step.png" alt="frame advance" width="auto" height=18 />
 				</button>
 				<span id="step-tip" class="tip"></span>
