@@ -4,15 +4,18 @@ var p = m * n; // broj ćelija tabele
 var counter; // brojač koraka simulacije
 var ledFlag; // indikator stanja LED-diode za vreme njenog blinkanja u režimu „PAUSE“ (0 – off; 1 – on)
 var ledLoop = 0; // varijabla timing-eventa treperenja LED-diode u režimu „PAUSE“
+var runLoop = 0; // varijabla timing-eventa izvršavanja radne petlje
 var imgFolder = "images/"; // lokacija foldera za slike
 var playButton = imgFolder + "play.png"; // lokacija simbola za "PLAY"
 var pauseButton = imgFolder + "pause.png"; // lokacija simbola za "PAUSE"
 var playPauseButton = imgFolder + "play-pause.png"; // lokacija simbola za "PLAY" i "PAUSE"
 var stepButton = imgFolder + "step.png"; // lokacija simbola za "FRAME ADVANCE"
 var stepButtonDisabled = imgFolder + "step-disabled.png"; // lokacija deaktiviranog simbola za "FRAME ADVANCE"
-var stepRevButton = imgFolder + "step-rev.png"; // lokacija simbola za "FRAME ADVANCE"
-var stepRevButtonDisabled = imgFolder + "step-rev-disabled.png"; // lokacija deaktiviranog simbola za "FRAME ADVANCE"
-var mode = 0; // flag radnog režima (0 – STOP; 1 – PLAY; 2 – PAUSE)
+var stepRevButton = imgFolder + "step-rev.png"; // lokacija simbola za "PREVIOUS FRAME"
+var stepRevButtonDisabled = imgFolder + "step-rev-disabled.png"; // lokacija deaktiviranog simbola za "PREVIOUS FRAME"
+var reverseButton = imgFolder + "reverse.png"; // lokacija simbola za "REVERSE"
+var reverseButtonDisabled = imgFolder + "reverse-disabled.png"; // lokacija deaktiviranog simbola za "REVERSE"
+var mode = 0; // flag radnog režima (0 – STOP; 1 – PLAY; 2 – PAUSE; 3 – REVERSE)
 var cellsArray = []; // niz u kojem se čuvaju statusi ćelija
 var edge = 0; // varijabla za edge-mod (0 – ivice se ponašaju kao fizičke prepreke; 1 – prolaskom kroz svaku ivicu element se pojavljuje na suprotnoj ivici tabele)
 
@@ -26,6 +29,8 @@ function drawTable(content) { // crtanje nove tabele (prazne ili s nekim drugim 
 	var a = ""; // tekstualna promenljiva u koju smeštamo HTML-kôd trenutnog reda tabele
 	counter = 0; // resetovanje brojača koraka, budući da je s prethodnom simulacijom završeno
 	document.getElementById("counter").innerHTML = ""; // uklanjanje prikaza broja koraka (iz istog razloga kao malopre)
+	reverseDeact(); // deaktivacija dugmeta za vraćanje simulacije unazad
+	stepRevDeact(); // deaktivacija dugmeta za prethodni korak simulacije
 	cellsArray[0] = []; // globalni niz u kojem se čuva sadržaj tabele u nultom (inicijalnom) koraku
 	if (ledLoop != 0) { // ako LED-dioda treperi...
 		clearInterval(ledLoop); // ...zaustavi treperenje
@@ -134,6 +139,7 @@ function newStatus(x, neighbours) { // vrednost funkcije predstavlja novi status
 }
 
 function oneStep() { // aktivira se pritiskom na „FRAME ADVANCE“ dugme ili na njegov keyboard shorcut; služi da se dugme „PREVIOUS FRAME“ aktivira pre pozivanja glavne funkcije step()
+	reverseAct(); // aktivacija dugmeta „REVERSE“
 	stepRevAct(); // aktivacija dugmeta „PREVIOUS FRAME“
 	step(); // izvršavanje koraka simulacije
 }
@@ -243,7 +249,7 @@ function displayNew() { // prikazuje sadržaj tabele na osnovu podataka smešten
 	}
 }
 
-function displayNewWhileStopPause() { // ova funkcija se pokreće ukoliko je u toku režima „STOP“ ili „PAUSE“ uključena ili isključena opcija da se promene prikazuju u boji (u toku „STOP“ režima može biti potrebe za ovom funkcijom u slučaju da je simulacija pokrenuta dugmetom „FRAME ADVANCE“, pri čemu se ostalo u „STOP“ modu)
+function displayNewWhileStopPause() { // ova funkcija se pokreće ukoliko je u toku režima „STOP“ ili „PAUSE“ uključena ili isključena opcija da se promene prikazuju u boji (u toku režima „STOP“ može biti potrebe za ovom funkcijom u slučaju da je simulacija pokrenuta dugmetom „FRAME ADVANCE“, pri čemu se ostalo u „STOP“ modu)
 	if (mode != 1) { // ako je trenutni radni režim „STOP“ ili „PAUSE“
 		displayNew(); // pozvati funkciju koja prikazuje sadržaj tabele na osnovu podataka smeštenih u globalnom nizu cellsArray[]
 	}
@@ -252,32 +258,106 @@ function displayNewWhileStopPause() { // ova funkcija se pokreće ukoliko je u t
 function stepRev() { // vraća simulaciju za jedan korak
 	counter--; // umanjujemo brojač koraka simulacije za jedan
 	if (counter == 0) { // ako smo stigli do nultog koraka simulacije...
-		stepRevDeact(); // ...deaktiviramo dugme za prethodni korak simulacije
+		reverseDeact(); // ...deaktiviramo dugme za vraćanje simulacije unazad
+		stepRevDeact(); // takođe deaktiviramo dugme za prethodni korak simulacije
+		// zaustavljanje radne petlje
+		if (runLoop != 0) {
+			clearInterval(runLoop);
+			runLoop = 0;
+		}
+		clearInterval(ledLoop); // zaustavlja se treperenje diode...
+		ledLoop = 0; // ...i varijabla timing-eventa treperenja se postavlja na nulu
+		document.getElementById("led").className = "led-off"; // LED se isključuje
+		document.getElementById("start").getElementsByTagName("img")[0].src = playButton; // na aktivacionom dugmetu prikazuje se oznaka „PLAY“
+		document.getElementById("start-tip").innerHTML = langArray["start tip"]; // help tip se postavlja na „pokretanje simulacije“
+		afterReverse(); // reaktivacija dugmadi i opcija nakon završetka režima „REVERSE“
+		mode = 0; // prelazi se u režim „STOP“
 	}
 	dispCounter(); // prikazivanje brojača koraka
 	displayNew(); // prikazivanje stanja tabele u trenutnom koraku
 }
 
+function reverse() { // vraća simulaciju unazad
+	if (mode != 1 && mode != 3 && counter > 0) { // komanda za reverse sa prihvata samo u režimima „STOP“ i „PAUSE“ i to u slučaju da je izvršen bar jedan korak simulacije
+		// deaktivacija dugmadi koja ne mogu biti korišćena tokom vraćanja simulacije unazad
+		document.getElementById("random").className = "deact"; // deaktiviranje help-tipa za regulator gustine random rasporeda
+		document.getElementById("density").disabled = true;
+		document.getElementsByClassName("commands1")[0].getElementsByTagName("ul")[0].className = "deact"; // deaktiviranje help-tipa za tastere predefinisanih sadržaja
+		document.getElementById("white").disabled = true;
+		document.getElementById("black").disabled = true;
+		document.getElementById("hor").disabled = true;
+		document.getElementById("vert").disabled = true;
+		document.getElementById("diag").disabled = true;
+		document.getElementById("chess").disabled = true;
+		document.getElementById("inverse").disabled = true;
+		stepRevDeact(); // deaktivacija dugmeta „PREVIOUS FRAME“
+		stepDeact(); // deaktivacija dugmeta „FRAME ADVANCE“
+		document.getElementById("edge").className = "deact";
+		document.getElementById("edge1").disabled = true;
+		document.getElementById("edge2").disabled = true;
+
+		clearInterval(ledLoop); // zaustavlja se treperenje diode iz režima „PAUSE“...
+		ledLoop = 0; // ...i varijabla timing-eventa treperenja se postavlja na nulu
+		ledFlag = 0; // pre ulaska u petlju za treperenje postavljamo indikator da je LED isključena
+		ledLoop = setInterval(ledBlink, 170); // petlja za treperenje LED-diode, s periodom od 170ms
+
+		mode = 3; // mode varijabla se postavlja na vrednost koja označava režim „REVERSE“
+		document.getElementById("start").getElementsByTagName("img")[0].src = pauseButton; // na aktivacionom dugmetu se prikazuje simbol "PAUSE"
+		document.getElementById("start-tip").innerHTML = langArray["pause tip"]; // help tip se postavlja na „pauziranje simulacije“
+		a = document.getElementById("speed").value; // podešavanje brzine na osnovu položaja klizača brzine
+		runLoop = setInterval(stepRev, 1361 - 150 * a); // ponavljanje radne petlje
+	}
+}
+
+function afterReverse() { // reaktivacija dugmadi i opcija nakon završetka režima „REVERSE“
+	document.getElementById("random").className = ""; // aktiviranje help-tipa za regulator gustine random rasporeda
+	document.getElementById("density").disabled = false;
+	document.getElementsByClassName("commands1")[0].getElementsByTagName("ul")[0].className = ""; // aktiviranje help-tipa za tastere predefinisanih sadržaja
+	document.getElementById("white").disabled = false;
+	document.getElementById("black").disabled = false;
+	document.getElementById("hor").disabled = false;
+	document.getElementById("vert").disabled = false;
+	document.getElementById("diag").disabled = false;
+	document.getElementById("chess").disabled = false;
+	document.getElementById("inverse").disabled = false;
+	document.getElementById("step").disabled = false;
+	stepAct(); // aktivacija dugmeta „FRAME ADVANCE“
+	document.getElementById("edge").className = "";
+	document.getElementById("edge1").disabled = false;
+	document.getElementById("edge2").disabled = false;
+}
+
 function setSpeed() { // podešavanje brzine na osnovu položaja klizača brzine i ponavljanje radne petlje
 	a = document.getElementById("speed").value; // podešavanje brzine na osnovu položaja klizača brzine
-	runLoop = setInterval(step, 1361 - 150 * a); // ponavljanje radne petlje
+	b = 1361 - 150 * a;
+	if (mode == 1) {
+		runLoop = setInterval(step, b); // ponavljanje radne petlje (za režim „PLAY“)
+	} else {
+		runLoop = setInterval(stepRev, b); // ponavljanje radne petlje (za režim „REVERSE“)
+	}
 }
 
 function run() { // Prelazak u režim „PLAY“ ili „PAUSE“
-	if (mode == 1) { // ako je režim bio „PLAY“, prelazak u režim „PAUSE“
+	if (mode == 1 || mode == 3) { // ako je režim bio „PLAY“ ili „REVERSE“, prelazak u režim „PAUSE“
 		clearInterval(runLoop); // zaustavlja se radna petlja
-		mode = 2; // flag radnog režima se postavlja na vrednost koji označava režim „PAUSE“
 		document.getElementById("start").getElementsByTagName("img")[0].src = playPauseButton; // na aktivacionom dugmetu se prikazuju simboli "PLAY" i "PAUSE"
 		document.getElementById("start-tip").innerHTML = langArray["cont tip"]; // help tip se postavlja na „nastavljanje simulacije“
 		document.getElementById("step").disabled = false; // ponovo se aktivira dugme „FRAME ADVANCE“ (koje je bilo deaktivirano tokom režima „PLAY“)
 		document.getElementById("step").getElementsByTagName("img")[0].src = stepButton; // ponovo se aktivira i slika njegovog simbola na tasteru
 		document.getElementById("step-tip").className = "tip"; // samim tim, pošto je dugme aktivirano, treba da se hoverom na njega ispisuje i help tip
 		if (counter > 0) { // ukoliko nismo na nultom koraku simulacije...
-			stepRevAct(); // ...aktivaceija dugmeta za prethodni korak simulacije
+			reverseAct(); // ...aktivacija dugmeta za vraćanje simulacije unazad
+			stepRevAct(); // takođe, aktivacija dugmeta za prethodni korak simulacije
 		}
 		document.getElementById("led").className = "led-off"; // LED se isključuje pre započinjanja treperućeg režima
+		if (mode = 3) { // ako je režim bio „REVERSE“...
+			clearInterval(ledLoop); // ...zaustavlja se treperenje diode...
+			ledLoop = 0; // ...i varijabla timing-eventa treperenja se postavlja na nulu
+			afterReverse(); // reaktivacija dugmadi i opcija nakon završetka režima „REVERSE“
+		}
 		ledFlag = 0; // pre ulaska u petlju za treperenje postavljamo indikator da je LED isključena
 		ledLoop = setInterval(ledBlink, 500); // petlja za treperenje LED-diode, s periodom od 500ms
+		mode = 2; // flag radnog režima se postavlja na vrednost koji označava režim „PAUSE“
 	}
 	else { // Ako je režim bio „STOP“ ili „PAUSE“, onda prelazak u režim „PLAY“
 		if (mode == 2) { // u slučaju da je režim bio „PAUSE“...
@@ -288,24 +368,57 @@ function run() { // Prelazak u režim „PLAY“ ili „PAUSE“
 		document.getElementById("start").getElementsByTagName("img")[0].src = pauseButton; // na aktivacionom dugmetu se prikazuje simbol "PAUSE"
 		document.getElementById("start-tip").innerHTML = langArray["pause tip"]; // help tip se postavlja na „pauziranje simulacije“
 		document.getElementById("led").className = "led-on"; // LED se uključuje
-		document.getElementById("step").disabled = true; // za vreme „PLAY“ režima, dugme „FRAME ADVANCE“ je deaktivirano
+		document.getElementById("step").disabled = true; // za vreme režima „PLAY“, dugme „FRAME ADVANCE“ je deaktivirano
 		document.getElementById("step").getElementsByTagName("img")[0].src = stepButtonDisabled; // deaktivira se i slika njegovog simbola na tasteru
 		document.getElementById("step-tip").className = "tip-deact"; // samim tim, pošto je dugme deaktivirano, hoverom na njega ne treba da se ispisuje help tip
-		stepRevDeact(); // deaktivaceija dugmeta za prethodni korak simulacije
+		reverseDeact(); // deaktivacija dugmeta za vraćanje simulacije unazad
+		stepRevDeact(); // deaktivacija dugmeta za prethodni korak simulacije
 		setSpeed(); // podešavanje brzine na osnovu položaja klizača brzine i ponavljanje radne petlje
 	}
 }
 
-function stepRevAct() { // aktivaceija dugmeta za prethodni korak simulacije
-	document.getElementById("step-rev").disabled = false; // aktivira se dugme „PREVIOUS FRAME“ (koje je bilo deaktivirano tokom režima „PLAY“)
+// Aktivacija i deaktivacija dugmadi
+
+// aktivacija dugmeta „PREVIOUS FRAME“
+function stepRevAct() {
+	document.getElementById("step-rev").disabled = false; // aktivira se dugme „PREVIOUS FRAME“
 	document.getElementById("step-rev").getElementsByTagName("img")[0].src = stepRevButton; // aktivira se i slika njegovog simbola na tasteru
 	document.getElementById("step-rev-tip").className = "tip"; // samim tim, pošto je dugme aktivirano, treba da se hoverom na njega ispisuje i help tip
 }
 
-function stepRevDeact() { // deaktivaceija dugmeta za prethodni korak simulacije
-	document.getElementById("step-rev").disabled = true; // za vreme „PLAY“ režima, dugme „PREVIOUS FRAME“ je deaktivirano
+// deaktivacija dugmeta „PREVIOUS FRAME“
+function stepRevDeact() {
+	document.getElementById("step-rev").disabled = true; // deaktivira se dugme „PREVIOUS FRAME“
 	document.getElementById("step-rev").getElementsByTagName("img")[0].src = stepRevButtonDisabled; // deaktivira se i slika njegovog simbola na tasteru
 	document.getElementById("step-rev-tip").className = "tip-deact"; // samim tim, pošto je dugme deaktivirano, hoverom na njega ne treba da se ispisuje help tip
+}
+
+// aktivacija dugmeta „REVERSE“
+function reverseAct() {
+	document.getElementById("reverse").disabled = false; // aktivira se dugme „REVERSE“
+	document.getElementById("reverse").getElementsByTagName("img")[0].src = reverseButton; // aktivira se i slika njegovog simbola na tasteru
+	document.getElementById("reverse-tip").className = "tip"; // samim tim, pošto je dugme aktivirano, treba da se hoverom na njega ispisuje i help tip
+}
+
+// deaktivacija dugmeta „REVERSE“
+function reverseDeact() {
+	document.getElementById("reverse").disabled = true; // deaktivira se dugme „REVERSE“
+	document.getElementById("reverse").getElementsByTagName("img")[0].src = reverseButtonDisabled; // deaktivira se i slika njegovog simbola na tasteru
+	document.getElementById("reverse-tip").className = "tip-deact"; // samim tim, pošto je dugme deaktivirano, hoverom na njega ne treba da se ispisuje help tip
+}
+
+// aktivacija dugmeta „FRAME ADVANCE“
+function stepAct() {
+	document.getElementById("step").disabled = false; // aktivira se dugme „FRAME ADVANCE“
+	document.getElementById("step").getElementsByTagName("img")[0].src = stepButton; // aktivira se i slika njegovog simbola na tasteru
+	document.getElementById("step-tip").className = "tip"; // samim tim, pošto je dugme aktivirano, treba da se hoverom na njega ispisuje i help tip
+}
+
+// deaktivacija dugmeta „FRAME ADVANCE“
+function stepDeact() {
+	document.getElementById("step").disabled = true; // deaktivira se dugme „FRAME ADVANCE“
+	document.getElementById("step").getElementsByTagName("img")[0].src = stepButtonDisabled; // deaktivira se i slika njegovog simbola na tasteru
+	document.getElementById("step-tip").className = "tip-deact"; // samim tim, pošto je dugme deaktivirano, hoverom na njega ne treba da se ispisuje help tip
 }
 
 function ledBlink() { // treperenje LED-diode u režimu „PAUSE“
@@ -319,7 +432,7 @@ function ledBlink() { // treperenje LED-diode u režimu „PAUSE“
 }
 
 function changeSpeed() { // promena brzine u toku simulacije
-	if (mode == 1) { // izvršava se jedino u režimu „PLAY“
+	if (mode == 1 || mode == 3) { // izvršava se jedino u režimu „PLAY“ ili u režimu „REVERSE“
 		clearInterval(runLoop); // prekida se dosadašnja radna petlja...
 		setSpeed(); // ...i startuje nova, s novopodešenom brzinom
 	}
@@ -362,12 +475,13 @@ function english() {
 	langArray["diag tip"] = "The arrangement of the<br />alive and the dead cells<br />in the form of diagonal bars.<br />Keyboard shortcut: <span class='keyshort'>G</span>";
 	langArray["chess tip"] = "The arrangement of the alive<br />and the dead cells in the<br />form of a chessboard fields.<br />Keyboard shortcut: <span class='keyshort'>H</span>";
 	langArray["inverse tip"] = "Replaces all the black (live) cells with<br />the white (dead) cells and vice versa;<br />after this, the simulation step counter<br />returns to zero, since hereby<br />the new simulation is started.<br />Keyboard shortcut: <span class='keyshort'>I</span>";
+	langArray["reverse tip"] = "Starts the simulation backwards.<br />Keyboard shortcut: <span class='keyshort'>C</span>";
 	langArray["step rev tip"] = "Goes back one<br />simulation step.<br />Keyboard shortcut: <span class='keyshort'>C</span>";
 	langArray["step tip"] = "Executes one<br />simulation step.<br />Keyboard shortcut: <span class='keyshort'>V</span>";
 	langArray["start tip"] = "Starts the simulation.<br />Keyboard shortcut: <span class='keyshort'>B</span>";
 	langArray["pause tip"] = "Pauses the simulation.<br />Keyboard shortcut: <span class='keyshort'>B</span>";
 	langArray["cont tip"] = "Continues the simulation.<br />Keyboard shortcut: <span class='keyshort'>B</span>";
-	langArray["led tip"] = 'Mode LED-indicator:<ul><li>off: "STOP" mode</li><li>on: "PLAY" mode</li><li>blinking: "PAUSE" mode</li></ul>';
+	langArray["led tip"] = 'Mode LED-indicator:<ul><li>off: "STOP" mode</li><li>on: "PLAY" mode</li><li>slow blinking: "PAUSE" mode</li><li>fast blinking: "REVERSE" mode</li></ul>';
 	langArray["speed tip"] = "Simulation speed regulator:<ul><li>Leftmost position – minimal speed</li><li>Rightmost position – maximal speed</li></ul>Keyboard shortcuts:<br /><ul><li><span class='keyshort'>N</span> (reduces speed)</li><li><span class='keyshort'>M</span> (increase speed)</li></ul>";
 	langArray["changes tip"] = "When unchecked, the cells are<br />displayed in two colors:<ul><li>black: alive</li><li>white: dead</li></ul>Checking this option adds two<br />more colors:<ul><li>blue: the cell has just revived</li><li>yellow: the cell has just died</li></ul>Keyboard shortcut: <span class='keyshort'>K</span>";
 	langArray["edge tip"] = "The way cells located on the edges<br />of the table behave:<ul><li>mode 1: the table edges act like<br />real, physical walls – there's no<br />anything behind them;</li><li>mode 2: behind the right edge<br />there's the left edge of the table,<br />behind the bottom edge there's<br />the top edge of the table and<br />so on. In other words, the table<br />can be observed as a surface of<br />the sphere, whereby it's right<br />edge is joined with the left edge,<br />likewise the bottom with the top<br />edge.</li></ul>Keyboard shortcut: <span class='keyshort'>L</span>";
@@ -413,12 +527,13 @@ function serbian() {
 	langArray["diag tip"] = "Raspoređivanje živih i mrtvih ćelija<br />u vidu dijagonalnih pruga.<br />Prečica na tastaturi: <span class='keyshort'>G</span>";
 	langArray["chess tip"] = "Raspoređivanje živih<br />i mrtvih ćelija u vidu<br />polja na šahovskoj tabli.<br />Prečica na tastaturi: <span class='keyshort'>H</span>";
 	langArray["inverse tip"] = "Zamena svih crnih (živih) ćelija<br />belim (mrtvim) ćelijama i obratno;<br />nakon ovoga, brojač koraka<br />simulacije se vraća na nulu,<br />budući da ovime počinje<br />nova simulacija.<br />Prečica na tastaturi: <span class='keyshort'>I</span>";
+	langArray["reverse tip"] = "Vraćanje simulacije unazad.<br />Prečica na tastaturi: <span class='keyshort'>X</span>";
 	langArray["step rev tip"] = "Vraćanje za jedan<br />korak simulacije.<br />Prečica na tastaturi: <span class='keyshort'>C</span>";
 	langArray["step tip"] = "Izvršavanje jednog<br />koraka simulacije.<br />Prečica na tastaturi: <span class='keyshort'>V</span>";
 	langArray["start tip"] = "Pokretanje simulacije.<br />Prečica na tastaturi: <span class='keyshort'>B</span>";
 	langArray["pause tip"] = "Pauziranje simulacije.<br />Prečica na tastaturi: <span class='keyshort'>B</span>";
 	langArray["cont tip"] = "Nastavljanje simulacije.<br />Prečica na tastaturi: <span class='keyshort'>B</span>";
-	langArray["led tip"] = "Indikator režima rada:<ul><li>isključeno: režim „STOP“</li><li>uključeno: režim „PLAY“</li><li>treperenje: režim „PAUSE“</li></ul>";
+	langArray["led tip"] = "Indikator režima rada:<ul><li>isključeno: režim „STOP“</li><li>uključeno: režim „PLAY“</li><li>sporo treperenje: režim „PAUSE“</li><li>brzo treperenje: režim „REVERSE“</li></ul>";
 	langArray["speed tip"] = "Regulator brzine simulacije:<ul><li>Krajnji levi položaj – najmanja brzina</li><li>Krajnji desni položaj – najveća brzina</li></ul>Prečice na tastaturi:<br /><ul><li><span class='keyshort'>N</span> (smanjivanje brzine)</li><li><span class='keyshort'>M</span> (povećavanje brzine)</li></ul>";
 	langArray["changes tip"] = "Kada je ova opcija isključena,<br />ćelije se prikazuju u dve boje:<ul><li>crna: živa</li><li>bela: mrtva</li></ul>Uključenjem ove opcije dodaju se<br />dve nove boje:<ul><li>plava: ćelija je upravo oživela</li><li>žuta: ćelija je upravo umrla</li></ul>Prečica na tastaturi: <span class='keyshort'>K</span>";
 	langArray["edge tip"] = "Način na koji se ponašaju ćelije<br />locirane na ivicama tabele:<ul><li>mode 1: ivice tabele se ponašaju<br />kao pravi, fizički zidovi – ne postoji<br />ništa iza njih;</li><li>mode 2: iza desne ivice nalazi se<br />leva ivica tabele, iza donje ivice<br />nalazi se gornja ivica tabele itd.<br />Drugim rečima, tabela se može<br />posmatrati kao površina sfere,<br />pri čemu je njena desna ivica<br />spojena s desnom ivicom, isto<br />tako donja s gornjom ivicom.</li></ul>Prečica na tastaturi: <span class='keyshort'>L</span>";
@@ -463,17 +578,21 @@ function writeLang() { // prikazivanje natpisa i poruka na izabranom jeziku, na 
 	document.getElementById("diag-tip").innerHTML = langArray["diag tip"];
 	document.getElementById("chess-tip").innerHTML = langArray["chess tip"];
 	document.getElementById("inverse-tip").innerHTML = langArray["inverse tip"];
-	document.getElementById("step-tip").innerHTML = langArray["step tip"];
+	document.getElementById("reverse-tip").innerHTML = langArray["reverse tip"];
 	document.getElementById("step-rev-tip").innerHTML = langArray["step rev tip"];
+	document.getElementById("step-tip").innerHTML = langArray["step tip"];
 	switch(mode) { // help tip aktivacionog dugmeta se razlikuje u zavisnosti od toga da li je trenutni radni režim „STOP“, „PLAY“ ili „PAUSE“
 		case 0: // ukoliko je trenutni radni režim „STOP“...
 			document.getElementById("start-tip").innerHTML = langArray["start tip"]; // ...prikazuje se poruka „pokretanje simulacije“
 			break;
 		case 1: // ukoliko je trenutni radni režim „PLAY“...
-			document.getElementById("start-tip").innerHTML = langArray["pause tip"]; // ...prikazuje se poruka „paziranje simulacije“
+			document.getElementById("start-tip").innerHTML = langArray["pause tip"]; // ...prikazuje se poruka „pauziranje simulacije“
 			break;
 		case 2: // ukoliko je trenutni radni režim „PAUSE“...
 			document.getElementById("start-tip").innerHTML = langArray["cont tip"]; // ...prikazuje se poruka „nastavljanje simulacije“
+			break;
+		case 3: // ukoliko je trenutni radni režim „REVERSE“...
+			document.getElementById("start-tip").innerHTML = langArray["pause tip"]; // ...prikazuje se poruka „pauziranje simulacije“
 			break;
 	}
 	document.getElementById("led-tip").innerHTML = langArray["led tip"];
@@ -576,8 +695,14 @@ function key(event) {
 			inverse();
 			document.getElementById("inverse").focus(); // stavljanje fokusa na odgovarajuće dugme
 			break;
+		case 120: // taster „X“ za simulaciju unazad
+			if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „STOP“ i „PAUSE“, kao i pre izvršenja prvog koraka simulacije, opcija za simulaciju unazad je onemogućena
+				reverse();
+				document.getElementById("reverse").focus(); // stavljanje fokusa na odgovarajuće dugme
+			}
+			break;
 		case 99: // taster „C“ za vraćanje jednog koraka simulacije
-			if (mode != 1 && counter > 0) { // u režimu „PLAY“ (mode=1), kao i pre izvršenja prvog koraka simulacije, opcija za jedan korak simulacije je onemogućena
+			if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „STOP“ i „PAUSE“, kao i pre izvršenja prvog koraka simulacije, opcija za jedan korak simulacije je onemogućena
 				stepRev();
 				document.getElementById("step-rev").focus(); // stavljanje fokusa na odgovarajuće dugme
 			}
