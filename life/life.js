@@ -607,7 +607,7 @@ function writeLang() { // prikazivanje natpisa i poruka na izabranom jeziku, na 
 document.onkeypress = key;
 function key(event) {
 	var x = event.which || event.keyCode;
-	if (x >= 49 && x <= 57) { // pritisnut neki od tastera od 1 do 9, radi regulisanja gustine sadržaja
+	if (x >= 49 && x <= 57 && mode != 3) { // pritisnut neki od tastera od 1 do 9, radi regulisanja gustine sadržaja (neaktivno u režimu „REVERSE“)
 		document.getElementById("density").focus(); // stavljanje fokusa na regulator gustine sadržaja
 		switch(x) {
 			case 49: // taster „1“ za random raspored, s klizačem na položaju 1 (najređe raspoređene žive ćelije)
@@ -666,75 +666,79 @@ function key(event) {
 			}
 		}
 	}
+	if(mode !=3) { // komande koje su neaktivne tokom režima „REVERSE“
+		switch(x) {
+			case 108: // taster „L“ za izbor ponašanja ivica tabele
+				if(edge) { // ako je bilo postavljeno na mode 1, prebaciti na mode 0
+					document.getElementById("edge1").checked = true; // odabir odgovarajučeg radio-buttona
+					document.getElementById("edge1").focus(); // stavljanje fokusa na odgovarajuće dugme
+				} else { // u suprotnom (ako je bilo postavljeno na mode 0), prebaciti na mode 1
+					document.getElementById("edge2").checked = true; // odabir odgovarajučeg radio-buttona
+					document.getElementById("edge2").focus(); // stavljanje fokusa na odgovarajuće dugme
+				}
+				edge = 1 - edge;
+				displayNewWhileStopPause();
+				break;
+			case 97: // taster „A“ za tabelu sa svim belim (mrtvim) ćelijama
+				drawTable(1);
+				document.getElementById("white").focus(); // stavljanje fokusa na odgovarajuće dugme
+				break;
+			case 115: // taster „S“ za tabelu sa svim crnim (živim) ćelijama
+				drawTable(2);
+				document.getElementById("black").focus(); // stavljanje fokusa na odgovarajuće dugme
+				break;
+			case 100: // taster „D“ za raspored u vidu horizontalnih pruga
+				drawTable(3);
+				document.getElementById("hor").focus(); // stavljanje fokusa na odgovarajuće dugme
+				break;
+			case 102: // taster „F“ za raspored u vidu vertikalnih pruga
+				drawTable(4);
+				document.getElementById("vert").focus(); // stavljanje fokusa na odgovarajuće dugme
+				break;
+			case 103: // taster „G“ za raspored u vidu dijagonalnih pruga
+				drawTable(5);
+				document.getElementById("diag").focus(); // stavljanje fokusa na odgovarajuće dugme
+				break;
+			case 104: // taster „H“ za raspored u vidu šahovskih polja
+				drawTable(6);
+				document.getElementById("chess").focus(); // stavljanje fokusa na odgovarajuće dugme
+				break;
+			case 105: // taster „I“ za inverzni raspored (da sve bele ćelije postanu crne i obratno)
+				inverse();
+				document.getElementById("inverse").focus(); // stavljanje fokusa na odgovarajuće dugme
+				break;
+			case 120: // taster „X“ za simulaciju unazad
+				if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „STOP“ i „PAUSE“, kao i pre izvršenja prvog koraka simulacije, opcija za simulaciju unazad je onemogućena
+					reverse();
+					document.getElementById("reverse").focus(); // stavljanje fokusa na odgovarajuće dugme
+				}
+				break;
+			case 99: // taster „C“ za vraćanje jednog koraka simulacije
+				if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „STOP“ i „PAUSE“, kao i pre izvršenja prvog koraka simulacije, opcija za jedan korak simulacije je onemogućena
+					stepRev();
+					document.getElementById("step-rev").focus(); // stavljanje fokusa na odgovarajuće dugme
+				}
+				break;
+			case 118: // taster „V“ za izvršavanje jednog koraka simulacije
+				if (mode != 1) { // u režimu „PLAY“ (mode=1) opcija za jedan korak simulacije je onemogućena
+					oneStep();
+					document.getElementById("step").focus(); // stavljanje fokusa na odgovarajuće dugme
+				}
+				break;
+		}
+	}
 	switch(x) {
-		case 97: // taster „A“ za tabelu sa svim belim (mrtvim) ćelijama
-			drawTable(1);
-			document.getElementById("white").focus(); // stavljanje fokusa na odgovarajuće dugme
-			break;
-		case 115: // taster „S“ za tabelu sa svim crnim (živim) ćelijama
-			drawTable(2);
-			document.getElementById("black").focus(); // stavljanje fokusa na odgovarajuće dugme
-			break;
-		case 100: // taster „D“ za raspored u vidu horizontalnih pruga
-			drawTable(3);
-			document.getElementById("hor").focus(); // stavljanje fokusa na odgovarajuće dugme
-			break;
-		case 102: // taster „F“ za raspored u vidu vertikalnih pruga
-			drawTable(4);
-			document.getElementById("vert").focus(); // stavljanje fokusa na odgovarajuće dugme
-			break;
-		case 103: // taster „G“ za raspored u vidu dijagonalnih pruga
-			drawTable(5);
-			document.getElementById("diag").focus(); // stavljanje fokusa na odgovarajuće dugme
-			break;
-		case 104: // taster „H“ za raspored u vidu šahovskih polja
-			drawTable(6);
-			document.getElementById("chess").focus(); // stavljanje fokusa na odgovarajuće dugme
-			break;
-		case 105: // taster „I“ za inverzni raspored (da sve bele ćelije postanu crne i obratno)
-			inverse();
-			document.getElementById("inverse").focus(); // stavljanje fokusa na odgovarajuće dugme
-			break;
-		case 120: // taster „X“ za simulaciju unazad
-			if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „STOP“ i „PAUSE“, kao i pre izvršenja prvog koraka simulacije, opcija za simulaciju unazad je onemogućena
-				reverse();
-				document.getElementById("reverse").focus(); // stavljanje fokusa na odgovarajuće dugme
-			}
-			break;
-		case 99: // taster „C“ za vraćanje jednog koraka simulacije
-			if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „STOP“ i „PAUSE“, kao i pre izvršenja prvog koraka simulacije, opcija za jedan korak simulacije je onemogućena
-				stepRev();
-				document.getElementById("step-rev").focus(); // stavljanje fokusa na odgovarajuće dugme
-			}
-			break;
-		case 118: // taster „V“ za izvršavanje jednog koraka simulacije
-			if (mode != 1) { // u režimu „PLAY“ (mode=1) opcija za jedan korak simulacije je onemogućena
-				oneStep();
-				document.getElementById("step").focus(); // stavljanje fokusa na odgovarajuće dugme
-			}
-			break;
 		case 98: // taster „B“ za pokretanje/pauziranje simulacije
 			run();
 			document.getElementById("start").focus(); // stavljanje fokusa na odgovarajuće dugme
 			break;
-		case 107: // taster „K“ za pokretanje/pauziranje simulacije
+		case 107: // taster „K“ da se promene statusa ćelija prikazuju u boji
 			if(document.getElementById("changes").checked) {
 				document.getElementById("changes").checked = false;
 			} else {
 				document.getElementById("changes").checked = true;
 			}
 			document.getElementById("changes").focus(); // stavljanje fokusa na odgovarajuće dugme
-			displayNewWhileStopPause();
-			break;
-		case 108: // taster „L“ za izbor ponašanja ivica tabele
-			if(edge) { // ako je bilo postavljeno na mode 1, prebaciti na mode 0
-				document.getElementById("edge1").checked = true; // odabir odgovarajučeg radio-buttona
-				document.getElementById("edge1").focus(); // stavljanje fokusa na odgovarajuće dugme
-			} else { // u suprotnom (ako je bilo postavljeno na mode 0), prebaciti na mode 1
-				document.getElementById("edge2").checked = true; // odabir odgovarajučeg radio-buttona
-				document.getElementById("edge2").focus(); // stavljanje fokusa na odgovarajuće dugme
-			}
-			edge = 1 - edge;
 			displayNewWhileStopPause();
 			break;
 	}
