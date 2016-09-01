@@ -170,6 +170,10 @@ td.revived {
 	margin-bottom: 0px;	
 }
 
+.commands2 ul {
+	left: -5px;	
+}
+
 .counter-random ul, .commands1 ul, .commands2 ul {
 	list-style-type: none;
 	position: relative;
@@ -190,9 +194,9 @@ td.revived {
 }
 
 button {
-	padding: 2px 5px;
+	padding: 2px 0px;
 	font-size: 12px;
-	min-width: 50px;
+	min-width: 40px;
 }
 
 #changes {
@@ -217,6 +221,14 @@ button {
 
 #changes-in-color, #edge {
 	font-size: 12px;
+}
+
+.deact {
+	color: grey;
+}
+
+.deact #density {
+	cursor: default;
 }
 
 li .tip {
@@ -246,8 +258,8 @@ li .tip {
 	outline: none;
 }
 
-li .tip-deact {
-	display:none;
+li .tip-deact, .deact .tip {
+	display: none;
 }
 
 .counter-random li .tip {
@@ -300,7 +312,7 @@ button img {
 }
 
 #step {
-	width: 40px;
+	width: 20px;
 }
 
 .led-off, .led-on {
