@@ -35,17 +35,15 @@ h1 {
 
 #help2 {	
 	visibility: hidden;
-	width: 760px;
+	width: 773px;
 	background-color: #FFFFE1;
 	color: #000;
-	text-align: justify!important;
+	text-align: justify;
 	border: black solid 1px;
 	border-radius: 4px;
-	padding: 2px 4px;
 	font-size: 12px;
-	text-align: left;
 	white-space: pre-wrap;
-	padding: 0 15px;
+	padding: 5px 8px;
 
 	/* Position the tooltip */
 	position: absolute;
@@ -60,8 +58,13 @@ h1 {
 	font-weight: normal;
 }
 
-#help2 p, #help2 ul {
+#help2 p {
 	margin: 3px;
+}
+
+#help2 ul {
+	margin: 0px;
+	padding-left: 30px;
 }
 
 .languages {
