@@ -18,6 +18,7 @@ var reverseButtonDisabled = imgFolder + "reverse-disabled.png"; // lokacija deak
 var mode = 0; // flag radnog režima (0 – STOP; 1 – PLAY; 2 – PAUSE; 3 – REVERSE)
 var cellsArray = []; // niz u kojem se čuvaju statusi ćelija
 var edge = 0; // varijabla za edge-mod (0 – ivice se ponašaju kao fizičke prepreke; 1 – prolaskom kroz svaku ivicu element se pojavljuje na suprotnoj ivici tabele)
+var mousedown = false; // ako je levi taster miša stisnut dok je kursor unutar tabele, onda TRUE; ako je levi taster miša otpušten bilo unutar, bilo van tabele, onda FALSE; koristi se radi crtanja po tabeli pomoću dragginga
 
 function init() {
 	english(); // prikazivanje natpisa i poruka na defaultnom (engleskom, zasad) jeziku
@@ -47,7 +48,7 @@ function drawTable(content) { // crtanje nove tabele (prazne ili s nekim drugim 
 		a += "<tr>"; // pri započinjanju svakog reda tabele na string a dodajemo otvarajući HTML-tag za red tabele
 		for (j = 1; j <= n; j++) { // petlja po kolonama tabele
 			cellID++; // redni broj trenutne ćelije se uvećava prilikom svakog prolaska kroz unutrašnju petlju
-			a += "<td id='" + cellID + "' onmousedown='changeCell(" + cellID + ")'";
+			a += "<td id='" + cellID + "' onmousedown='mouseDown(" + cellID + ")' onmouseenter='mouseEnter(" + cellID + ")' ondragstart='return false'"; // onmousedown u slučaju pritiska na levi taster miša postavlja flag mousedown na TRUE i menja status ćelije; onmouseenter, u slučaju da je flag mousedown postavljen na TRUE i da se kursorom miša prešlo iz jedne ćelije u drugu, menja status te ćelije u koju se prešlo; ondragstart='return false' sprečava pravi mouse-dragging, jer bi on zbrljao stvari
 			var life = false; // privremena varijabla u kojoj čuvamo status koji treba da ima trenutna ćelija (ćelija živa – true; ćelija mrtva – false)
 			switch(content) {
 				case 0: // žive i mrtve ćelije treba da budu random raspoređene
@@ -93,6 +94,21 @@ function drawTable(content) { // crtanje nove tabele (prazne ili s nekim drugim 
 		a += "</tr>"; // na kraju svakog reda tabele (tj. nakon prolaza kroz svaku spoljašnju petlju) dodajemo zatvarajući HTML-tag za red tabele
 	}
 	document.getElementById("table").innerHTML=a; // unošenje HTML-koda za celu tabelu
+}
+
+function mouseDown(x) { // ako je levi taster miša pritisnut unutar tabele, dok je kursor na ćeliji pod rednim brojem x, menja se status te ćelije i flag mousedown se postavlja na TRUE.
+	mousedown = true;
+	changeCell(x)
+}
+
+function mouseUp() { // ako je levi taster miša otpušten, flag mousedown treba vratiti na FALSE
+	mousedown = false;
+}
+
+function mouseEnter(x) { // ukoliko se, dok je levi taster miša pritisnut (tj. flag mousedown postavljen na TRUE), kursorom miša prešlo iz jedne u drugu ćeliju tabele koja je pod rednim brojem x, tada ćelija u koju se došlo menja svoj status
+	if (mousedown) {
+		changeCell(x)
+	}
 }
 
 function checkCell(x) { // vrednost funkcije je 0 ako je ćelija pod rednim brojem x mrtva, a 1 ako je živa
