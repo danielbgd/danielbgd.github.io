@@ -101,6 +101,10 @@ table {
 	border: 2px solid #000;
 }
 
+table:hover {
+	cursor: url("images/pencil.cur"), pointer;
+}
+
 tr, td {
 	border: 1px solid #ddd;
 }
