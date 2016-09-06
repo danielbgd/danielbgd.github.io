@@ -133,6 +133,14 @@ td.revived {
 	background-color: blue;
 }
 
+td.dead:hover {
+	background-color: #CCC;
+}
+
+td.alive:hover {
+	background-color: #555;
+}
+
 .counter-random {
 	width: 95%;
 	margin-left: auto;
