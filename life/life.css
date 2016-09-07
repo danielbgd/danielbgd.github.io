@@ -5,7 +5,7 @@ body {
 
 .container {
 	position: relative;
-	width: 850px;
+	max-width: 820px;
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
@@ -17,6 +17,10 @@ h1 {
 	margin-bottom: 10px;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+h2 {
+	display: none;
 }
 
 #help {
@@ -102,7 +106,7 @@ table {
 }
 
 table:hover {
-	cursor: url("images/pencil.cur"), pointer;
+	cursor: url(images/pencil.cur), pointer;
 }
 
 tr, td {
@@ -173,6 +177,10 @@ td.alive:hover {
 
 #density, #speed {
 	cursor: pointer;
+}
+
+#density:active, #speed:active {
+	cursor: url(images/leftright.cur), pointer;
 }
 
 .commands1 {	
@@ -273,12 +281,9 @@ li .tip {
 	outline: none;
 }
 
-li .tip-deact, .deact .tip {
-	display: none;
-}
-
 .counter-random li .tip {
 	bottom: 28px;
+	left: -35px;
 }
 
 .commands1 li .tip {
@@ -287,6 +292,14 @@ li .tip-deact, .deact .tip {
 
 .commands2 li .tip {
 	bottom: 28px;
+}
+
+#inverse-tip {
+	left: -24px;
+}
+
+#edge-tip {
+	left: -76px;
 }
 
 li:hover .tip {
@@ -347,4 +360,27 @@ button img {
 .led-on {
 	background: url(images/led.png) 0 -12px;
 	background-size: 12px auto;
+}
+
+@media screen and (max-width: 620px) {
+	.languages {
+		position: relative;
+		padding: 0;
+		right: 0;
+		margin-top: 40px;
+	}
+}
+
+@media screen and (max-width: 820px) {
+	table, #help, .counter-random, .commands1, .commands2 {
+		display: none;
+	}
+
+	h2 {
+		display: block;
+		color: #700;
+		margin: 40px auto 0 auto;
+		width: auto;
+		white-space: initial;
+	}
 }
