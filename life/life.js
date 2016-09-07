@@ -3,7 +3,7 @@ var n = 80; // broj kolona tabele
 var p = m * n; // broj ćelija tabele
 var counter; // brojač koraka simulacije
 var ledFlag; // indikator stanja LED-diode za vreme njenog blinkanja u režimu „PAUSE“ (0 – off; 1 – on)
-var ledLoop = 0; // varijabla timing-eventa treperenja LED-diode u režimu „PAUSE“
+var ledLoop = 0; // varijabla timing-eventa treperenja LED-diode u režimima „PAUSE“ i „REVERSE“
 var runLoop = 0; // varijabla timing-eventa izvršavanja radne petlje
 var imgFolder = "images/"; // lokacija foldera za slike
 var playButton = imgFolder + "play.png"; // lokacija simbola za "PLAY"
@@ -17,48 +17,54 @@ var reverseButton = imgFolder + "reverse.png"; // lokacija simbola za "REVERSE"
 var reverseButtonDisabled = imgFolder + "reverse-disabled.png"; // lokacija deaktiviranog simbola za "REVERSE"
 var mode = 0; // flag radnog režima (0 – STOP; 1 – PLAY; 2 – PAUSE; 3 – REVERSE)
 var cellsArray = []; // niz u kojem se čuvaju statusi ćelija
-var edge = 0; // varijabla za edge-mod (0 – ivice se ponašaju kao fizičke prepreke; 1 – prolaskom kroz svaku ivicu element se pojavljuje na suprotnoj ivici tabele)
-var mousedown = false; // ako je levi taster miša stisnut dok je kursor unutar tabele, onda TRUE; ako je levi taster miša otpušten bilo unutar, bilo van tabele, onda FALSE; koristi se radi crtanja po tabeli pomoću dragginga
+var edge = 0; // flag za edge-mod (0 – ivice se ponašaju kao fizičke prepreke; 1 – prolaskom kroz svaku ivicu element se pojavljuje na suprotnoj ivici tabele)
+var tablemousedown = false; // ako je levi taster miša stisnut dok je kursor unutar tabele, postavlja se na TRUE; ako je levi taster miša otpušten bilo unutar, bilo van tabele, postavlja se na FALSE; koristi se radi crtanja po tabeli pomoću dragginga
+var densityValue = 5; // varijabla koja sadrži vrednost regulatora gustine random rasporeda
+var speedValue = 5; // varijabla koja sadrži vrednost regulatora brzine simulacije
 
+// inicijalizacija
 function init() {
-	english(); // prikazivanje natpisa i poruka na defaultnom (engleskom, zasad) jeziku
+	serbian();
+	document.getElementById("density").value = densityValue; // postavljanje regulatora gustine random rasporeda na inicijalnu vrednost (sadržanu u varijabli „densityValue“)
+	document.getElementById("speed").value = speedValue; // postavljanje regulatora brzine simulacije na inicijalnu vrednost (sadržanu u varijabli „speedValue“)
 	drawTable(1); // formiranje tabele
 }
 
-function drawTable(content) { // crtanje nove tabele (prazne ili s nekim drugim predefinisanim sadržajem)
+// crtanje nove tabele (prazne ili s nekim drugim predefinisanim sadržajem, u zavisnosti od argumenta „content“)
+function drawTable(content) {
 	var i, j; // i – brojač redova tabele; j – brojač kolona tabele (redovi su numerisani od 1 do m, a kolone od 1 do n)
-	var a = ""; // tekstualna promenljiva u koju smeštamo HTML-kôd trenutnog reda tabele
+	var cellHTML = ""; // tekstualna promenljiva u koju smeštamo HTML-kôd trenutnog reda tabele
 	counter = 0; // resetovanje brojača koraka, budući da je s prethodnom simulacijom završeno
 	document.getElementById("counter").innerHTML = ""; // uklanjanje prikaza broja koraka (iz istog razloga kao malopre)
 	reverseDeact(); // deaktivacija dugmeta za vraćanje simulacije unazad
 	stepRevDeact(); // deaktivacija dugmeta za prethodni korak simulacije
 	cellsArray[0] = []; // globalni niz u kojem se čuva sadržaj tabele u nultom (inicijalnom) koraku
-	if (ledLoop != 0) { // ako LED-dioda treperi...
-		clearInterval(ledLoop); // ...zaustavi treperenje
-	}
 	if (mode == 2) { // ako je režim bio „PAUSE“...
 		mode = 0; // ...prelazak u režim „STOP“
 		document.getElementById("start").getElementsByTagName("img")[0].src = playButton; // na aktivacionom dugmetu prikazuje se oznaka „PLAY“
 		document.getElementById("start-tip").innerHTML = langArray["start tip"]; // help tip se postavlja na „pokretanje simulacije“
+		clearInterval(ledLoop); // zaustavljanje petlje za sporo treperenje LED-diode
 		ledLoop = 0;
 		document.getElementById("led").className = "led-off"; // LED se isključuje
 	}
 	var cellID = 0; // redni broj trenutne ćelije
+	if (content == 0) { // u slučaju da je izabran random raspored...
+		thresholdRandom = 0.08 * document.getElementById("density").value; // ... generiše se prag odlučivanja da li će ćelija biti mrtva ili živa – što je izabrana gustina živih ćelija veća, i prag za žive ćelije će biti veći
+	}
 	for (i = 1; i <= m; i++) { // petlja po redovima tabele
-		a += "<tr>"; // pri započinjanju svakog reda tabele na string a dodajemo otvarajući HTML-tag za red tabele
+		cellHTML += "<tr>"; // pri započinjanju svakog reda tabele na string „cellHTML“ dodajemo otvarajući HTML-tag za red tabele
 		for (j = 1; j <= n; j++) { // petlja po kolonama tabele
 			cellID++; // redni broj trenutne ćelije se uvećava prilikom svakog prolaska kroz unutrašnju petlju
-			a += "<td id='" + cellID + "' onmousedown='mouseDown(" + cellID + ")' onmouseenter='mouseEnter(" + cellID + ")' ondragstart='return false'"; // onmousedown u slučaju pritiska na levi taster miša postavlja flag mousedown na TRUE i menja status ćelije; onmouseenter, u slučaju da je flag mousedown postavljen na TRUE i da se kursorom miša prešlo iz jedne ćelije u drugu, menja status te ćelije u koju se prešlo; ondragstart='return false' sprečava pravi mouse-dragging, jer bi on zbrljao stvari
+			cellHTML += "<td id='" + cellID + "' onmousedown='tableMouseDown(" + cellID + ")' onmouseenter='tableMouseEnter(" + cellID + ")' ondragstart='return false'"; // započinjemo HTML-kôd za ćeliju tabele; onmousedown u slučaju pritiska na levi taster miša postavljaće flag „tablemousedown“ na TRUE i menjaće status ćelije; onmouseenter, u slučaju da je flag „tablemousedown“ postavljen na TRUE i da se kursorom miša prešlo iz jedne ćelije u drugu, menjaće status te ćelije u koju se prešlo; ondragstart='return false' sprečavaće pravi mouse-dragging, jer bi on zbrljao stvari
 			var life = false; // privremena varijabla u kojoj čuvamo status koji treba da ima trenutna ćelija (ćelija živa – true; ćelija mrtva – false)
 			switch(content) {
 				case 0: // žive i mrtve ćelije treba da budu random raspoređene
-					b = 0.08 * document.getElementById("density").value; // "density" predstavlja meru gustine random raspoređenih živih ćelija
-					if (Math.random() < b) {
+					if (Math.random() < thresholdRandom) { // ukoliko je random generisan broj (između 0 i 1) manji od praga za žive ćelije, ćelija će biti živa; u suprotnom, ostaće mrtva
 						life = true;
 					}
 					break;
 				// case 1 (sve bele ćelije) možemo preskočiti, jer varijabla life tada za svaku ćeliju zadržava već postojeću vrednost false
-				case 2: // sve ćelije tabele treba da budu crna (živa)
+				case 2: // sve ćelije tabele treba da budu crne (žive)
 					life = true;
 					break;
 				case 3:
@@ -83,35 +89,81 @@ function drawTable(content) { // crtanje nove tabele (prazne ili s nekim drugim 
 					break;
 			}
 			if(life) { // ako trenutna ćelija treba da bude živa...
-				a += " class='alive'"; // ...unošenje stila za prikaz žive ćelije tabele
-				cellsArray[0][cellID] = 1; // ...i unošenje jedinice u odgovarajući član globalnog niza cellsArray[] ([0] označava nulti korak simulacije)
+				cellHTML += " class='alive'"; // ...unošenje stila za prikaz žive ćelije tabele
+				cellsArray[0][cellID] = 1; // ...i unošenje jedinice u odgovarajući član globalnog niza „cellsArray[]“ ([0] označava nulti korak simulacije)
 			} else { // a ako trenutna ćelija treba da bude mrtva...
-				a += " class='dead'"; // ...unošenje stila za prikaz mrtve ćelije tabele
-				cellsArray[0][cellID] = 0; // ...i unošenje nule u odgovarajući član globalnog niza cellsArray[] ([0] označava nulti korak simulacije)
+				cellHTML += " class='dead'"; // ...unošenje stila za prikaz mrtve ćelije tabele
+				cellsArray[0][cellID] = 0; // ...i unošenje nule u odgovarajući član globalnog niza „cellsArray[]“ ([0] označava nulti korak simulacije)
 			}
-			a += "></td>"; // na kraju svake ćelije tabele (tj. nakon prolaza kroz svaku unutrašnju petlju) dodajemo zatvarajući HTML-tag za ćeliju tabele
+			cellHTML += "></td>"; // na kraju svake ćelije tabele (tj. nakon prolaza kroz svaku unutrašnju petlju) dodajemo zatvarajući HTML-tag za ćeliju tabele
 		}
-		a += "</tr>"; // na kraju svakog reda tabele (tj. nakon prolaza kroz svaku spoljašnju petlju) dodajemo zatvarajući HTML-tag za red tabele
+		cellHTML += "</tr>"; // na kraju svakog reda tabele (tj. nakon prolaza kroz svaku spoljašnju petlju) dodajemo zatvarajući HTML-tag za red tabele
 	}
-	document.getElementById("table").innerHTML=a; // unošenje HTML-koda za celu tabelu
+	document.getElementById("table").innerHTML = cellHTML; // unošenje HTML-koda za celu tabelu
 }
 
-function mouseDown(x) { // ako je levi taster miša pritisnut unutar tabele, dok je kursor na ćeliji pod rednim brojem x, menja se status te ćelije i flag mousedown se postavlja na TRUE.
-	mousedown = true;
-	changeCell(x)
+// ako je levi taster miša pritisnut unutar tabele, dok je kursor na ćeliji pod rednim brojem x, menja se status te ćelije i flag „tablemousedown“ se postavlja na TRUE
+function tableMouseDown(x) {
+	tablemousedown = true;
+	changeCell(x);
 }
 
-function mouseUp() { // ako je levi taster miša otpušten, flag mousedown treba vratiti na FALSE
-	mousedown = false;
+// ako je levi taster miša otpušten, flag „tablemousedown“ treba vratiti na FALSE
+function tableMouseUp() {
+	tablemousedown = false;
 }
 
-function mouseEnter(x) { // ukoliko se, dok je levi taster miša pritisnut (tj. flag mousedown postavljen na TRUE), kursorom miša prešlo iz jedne u drugu ćeliju tabele koja je pod rednim brojem x, tada ćelija u koju se došlo menja svoj status
-	if (mousedown) {
-		changeCell(x)
+// ukoliko se, dok je levi taster miša pritisnut (tj. flag „tablemousedown“ postavljen na TRUE), kursorom miša prešlo iz jedne u drugu ćeliju tabele koja je pod rednim brojem x, tada ćelija u koju se došlo menja svoj status
+function tableMouseEnter(x) {
+	if (tablemousedown) {
+		changeCell(x);
 	}
 }
 
-function checkCell(x) { // vrednost funkcije je 0 ako je ćelija pod rednim brojem x mrtva, a 1 ako je živa
+// ako je levi taster miša pritisnut dok je kursor na regulatoru gustine random rasporeda
+function densityMouseDown() {
+	densityValue = document.getElementById("density").value; // vrednost regulatora gustine random rasporeda kopira se u varijablu „densityValue“
+	drawTable(0); // crtanje tabele (argument 0 znači da se crta random raspored)
+	dnsLoop = setInterval(densityLoop, 100); // startovanje petlje u kojoj se proverava da li je došlo do pomeranja regulatora gustine random rasporeda
+}
+
+// petlja u kojoj se proverava da li je došlo do pomeranja regulatora gustine random rasporeda
+function densityLoop() {
+	if(densityValue != document.getElementById("density").value) { // ako položaj regulatora gustine random rasporeda više nije jednak vrednosti koja je sačuvana u varijabli „densityValue“, znači da je došlo do pomeranja regulatora
+		densityValue = document.getElementById("density").value; // u tom slučaju, nova vrednost koju daje regulator gustine random rasporeda kopira se u varijablu „densityValue“...
+		drawTable(0); // ...i crta se nova tabela (argument 0 znači da se crta random raspored)
+	}
+}
+
+// nakon otpuštanja levog tastera miša prilikom promene gustine random rasporeda...
+function densityMouseUp() {
+	clearInterval(dnsLoop); // zaustavlja se petlja za proveru pomeranja regulatora gustine
+}
+
+// ako je levi taster miša pritisnut dok je kursor na regulatoru brzine simulacije
+function speedMouseDown() {
+	if(speedValue != document.getElementById("speed").value) {
+		speedValue = document.getElementById("speed").value; // vrednost regulatora brzine simulacije kopira se u varijablu „speedValue“
+		changeSpeed();
+	}
+	spdLoop = setInterval(speedLoop, 100); // startovanje petlje u kojoj se proverava da li je došlo do pomeranja regulatora brzine simulacije
+}
+
+// petlja u kojoj se proverava da li je došlo do pomeranja regulatora brzine simulacije
+function speedLoop() {
+	if(speedValue != document.getElementById("speed").value) { // ako položaj regulatora brzine simulacije više nije jednak vrednosti koja je sačuvana u varijabli „speedValue“, znači da je došlo do pomeranja regulatora
+		speedValue = document.getElementById("speed").value; // u tom slučaju, nova vrednost koju daje regulator brzine simulacije kopira se u varijablu „speedValue“...
+		changeSpeed(); // i brzina simulacije se postavlja na novopodešenu vrednost
+	}
+}
+
+// nakon otpuštanja levog tastera miša prilikom promene brzine simulacije...
+function speedMouseUp() {
+	clearInterval(spdLoop); // zaustavlja se petlja za proveru pomeranja regulatora brzine
+}
+
+// vrednost funkcije je 0 ako je ćelija pod rednim brojem x mrtva, a 1 ako je živa
+function checkCell(x) {
 	if(document.getElementById(x).className == 'alive' || document.getElementById(x).className == 'revived') {
 		return 1;
 	} else {
@@ -119,7 +171,8 @@ function checkCell(x) { // vrednost funkcije je 0 ako je ćelija pod rednim broj
 	}
 }
 
-function changeCell(x) { // promena statusa ćelije pod rednim brojem x – ako je bila živa postaje mrtva, a ako je bila mrtva postaje živa
+// promena statusa ćelije pod rednim brojem x – ako je bila živa postaje mrtva, a ako je bila mrtva postaje živa
+function changeCell(x) {
 	if (checkCell(x)==1) {
 		document.getElementById(x).className = 'dead';
 	} else {
@@ -128,7 +181,8 @@ function changeCell(x) { // promena statusa ćelije pod rednim brojem x – ako 
 	cellsArray[counter][x] = 1 - (cellsArray[counter][x] % 2); // promena vrednosti trenutnog člana niza – ako je bio 0 (mrtvo) ili 2 (upravo umrlo), dobija vrednost 1 (živo); ako je bio 1 (živo) ili 3 (upravo oživljeno), dobija vrednost 0 (mrtvo)
 }
 
-function inverse() { // zamena svih živih ćelija mrtvima i obratno
+// zamena svih živih ćelija mrtvima i obratno
+function inverse() {
 	if (document.getElementById("counter").innerHTML != "") { // ukoliko je brojač prikazan...
 		counter = 0; // ...resetovanje brojača...
 		dispCounter(); // ...i njegovo ponovno prikazivanje
@@ -138,7 +192,8 @@ function inverse() { // zamena svih živih ćelija mrtvima i obratno
 	}
 }
 
-function newStatus(x, neighbours) { // vrednost funkcije predstavlja novi status ćelije (0 – mrtva, 1 – živa, 2 – upravo umrla, 3 – upravo oživela), u zavisnosti od njenog prethodnog statusa (x) i broja živih suseda (neighbours)
+// vrednost funkcije predstavlja novi status ćelije (0 – mrtva, 1 – živa, 2 – upravo umrla, 3 – upravo oživela), u zavisnosti od njenog prethodnog statusa (x) i broja živih suseda (neighbours)
+function newStatus(x, neighbours) {
 	if (checkCell(x) == 0 || checkCell(x) == 2) { // ukoliko je posmatrana ćelija mrtva...
 		if (neighbours == 3) { // ...i broj suseda jednak 3...
 			return 3; // ...tada mrtva ćelija oživljava, što predstavljamo statusom 3
@@ -154,18 +209,20 @@ function newStatus(x, neighbours) { // vrednost funkcije predstavlja novi status
 	}
 }
 
-function oneStep() { // aktivira se pritiskom na „FRAME ADVANCE“ dugme ili na njegov keyboard shorcut; služi da se dugme „PREVIOUS FRAME“ aktivira pre pozivanja glavne funkcije step()
+// aktivira se pritiskom na „FRAME ADVANCE“ dugme ili na njegov keyboard shorcut; služi da se dugmad „REVERSE“ i „PREVIOUS FRAME“ aktiviraju pre pozivanja glavne funkcije step()
+function oneStep() {
 	reverseAct(); // aktivacija dugmeta „REVERSE“
 	stepRevAct(); // aktivacija dugmeta „PREVIOUS FRAME“
 	step(); // izvršavanje koraka simulacije
 }
 
-function step() { // korak simulacije
+// korak simulacije
+function step() {
 	// prikazivanje rednog broja koraka simulacije
 	counter++; // uvećavanje koraka simulacije za jedan...
 	dispCounter(); // ...a zatim prikazivanje rednog broja trenutnog koraka
 
-	cellsArray[counter] = []; // niz u kojem će se čuvati statusi polja tabele za trenutni korak simulacije
+	cellsArray[counter] = []; // globalni niz u kojem se čuvaju statusi polja tabele za trenutni korak simulacije
 
 	var neighbours; // varijabla koja pokazuje koliko trenutna ćelija ima živih suseda
 	var doubleN = 2 * n; // privremena varijabla koja sadrži dvostruku vrednost broja kolona; uvedena radi optimizacije algoritma, budući da se ta vrednost često ponavlja u operacijama
@@ -236,17 +293,19 @@ function step() { // korak simulacije
 	displayNew();
 }
 
-function dispCounter() { // prikazivanje rednog broja koraka simulacije (na osnovu sadržaja globalne varijable counter)
+// prikazivanje rednog broja koraka simulacije (na osnovu sadržaja globalne varijable „counter“)
+function dispCounter() {
 	document.getElementById("counter").innerHTML = langArray["step count"] + " <span class='counter'>" + counter + "</span>";
 }
 
-function displayNew() { // prikazuje sadržaj tabele na osnovu podataka smeštenih u globalnom nizu cellsArray[]
+// prikazivanje sadržaja tabele na osnovu podataka smeštenih u globalnom nizu „cellsArray[]“
+function displayNew() {
 	var status; // privremena varijabla za smeštanje statusa trenutne ćelije tabele
 	for (i = 1; i <= p; i++) { // petlja po članovima niza (niz ima p=m*n članova, tj. onoliko koliko ima ćelija tabele)
 		if (document.getElementById("changes").checked) { // ukoliko je uključena opcija da se promene prikazuju bojama...
 			status = cellsArray[counter][i]; // ...tada uzimamo nepromenjenu vrednost člana niza
 		} else { // u suprotnom, ako je isključena opcija da se promene prikazuju bojama...
-			status = cellsArray[counter][i] % 2; // ... tada uzimamo ostatak pri deljenju sa 2 (0 ostaje 0, 1 ostaje 1, 2 postaje 0, 3 postaje 1)
+			status = cellsArray[counter][i] % 2; // ...tada uzimamo ostatak pri deljenju sa 2 (0 ostaje 0, 1 ostaje 1, 2 postaje 0, 3 postaje 1)
 		}
 		switch (status) {
 			case 0: // ako je ćelija mrtva
@@ -265,23 +324,20 @@ function displayNew() { // prikazuje sadržaj tabele na osnovu podataka smešten
 	}
 }
 
-function displayNewWhileStopPause() { // ova funkcija se pokreće ukoliko je u toku režima „STOP“ ili „PAUSE“ uključena ili isključena opcija da se promene prikazuju u boji (u toku režima „STOP“ može biti potrebe za ovom funkcijom u slučaju da je simulacija pokrenuta dugmetom „FRAME ADVANCE“, pri čemu se ostalo u „STOP“ modu)
-	if (mode != 1) { // ako je trenutni radni režim „STOP“ ili „PAUSE“
-		displayNew(); // pozvati funkciju koja prikazuje sadržaj tabele na osnovu podataka smeštenih u globalnom nizu cellsArray[]
-	}
-}
-
-function stepRev() { // vraća simulaciju za jedan korak
+// vraćanje simulacije za jedan korak
+function stepRev() {
 	counter--; // umanjujemo brojač koraka simulacije za jedan
 	if (counter == 0) { // ako smo stigli do nultog koraka simulacije...
 		reverseDeact(); // ...deaktiviramo dugme za vraćanje simulacije unazad
 		stepRevDeact(); // takođe deaktiviramo dugme za prethodni korak simulacije
+		
 		// zaustavljanje radne petlje
 		if (runLoop != 0) {
 			clearInterval(runLoop);
 			runLoop = 0;
 		}
-		clearInterval(ledLoop); // zaustavlja se treperenje diode...
+
+		clearInterval(ledLoop); // zaustavlja se treperenje LED-diode...
 		ledLoop = 0; // ...i varijabla timing-eventa treperenja se postavlja na nulu
 		document.getElementById("led").className = "led-off"; // LED se isključuje
 		document.getElementById("start").getElementsByTagName("img")[0].src = playButton; // na aktivacionom dugmetu prikazuje se oznaka „PLAY“
@@ -293,12 +349,13 @@ function stepRev() { // vraća simulaciju za jedan korak
 	displayNew(); // prikazivanje stanja tabele u trenutnom koraku
 }
 
-function reverse() { // vraća simulaciju unazad
-	if (mode != 1 && mode != 3 && counter > 0) { // komanda za reverse sa prihvata samo u režimima „STOP“ i „PAUSE“ i to u slučaju da je izvršen bar jedan korak simulacije
+// vraća simulaciju unazad
+function reverse() {
+	if (mode != 1 && mode != 3 && counter > 0) { // komanda „REVERSE“ se prihvata samo u režimima „STOP“ i „PAUSE“ i to u slučaju da je izvršen bar jedan korak simulacije
+	
 		// deaktivacija dugmadi koja ne mogu biti korišćena tokom vraćanja simulacije unazad
-		document.getElementById("random").className = "deact"; // deaktiviranje help-tipa za regulator gustine random rasporeda
+		document.getElementById("random").className = "deact"; // prikazivanje fonta regulatora gustine random rasporeda sivom (neaktivnom) bojom
 		document.getElementById("density").disabled = true;
-		document.getElementsByClassName("commands1")[0].getElementsByTagName("ul")[0].className = "deact"; // deaktiviranje help-tipa za tastere predefinisanih sadržaja
 		document.getElementById("white").disabled = true;
 		document.getElementById("black").disabled = true;
 		document.getElementById("hor").disabled = true;
@@ -308,16 +365,16 @@ function reverse() { // vraća simulaciju unazad
 		document.getElementById("inverse").disabled = true;
 		stepRevDeact(); // deaktivacija dugmeta „PREVIOUS FRAME“
 		stepDeact(); // deaktivacija dugmeta „FRAME ADVANCE“
-		document.getElementById("edge").className = "deact";
+		document.getElementById("edge").className = "deact"; // prikazivanje fonta opcije „edge“ sivom (neaktivnom) bojom
 		document.getElementById("edge1").disabled = true;
 		document.getElementById("edge2").disabled = true;
 
-		clearInterval(ledLoop); // zaustavlja se treperenje diode iz režima „PAUSE“...
+		clearInterval(ledLoop); // zaustavlja se sporo treperenje LED-diode iz režima „PAUSE“...
 		ledLoop = 0; // ...i varijabla timing-eventa treperenja se postavlja na nulu
-		ledFlag = 0; // pre ulaska u petlju za treperenje postavljamo indikator da je LED isključena
-		ledLoop = setInterval(ledBlink, 170); // petlja za treperenje LED-diode, s periodom od 170ms
+		ledFlag = 0; // pre ulaska u petlju za brzo treperenje postavljamo indikator da je LED isključena
+		ledLoop = setInterval(ledBlink, 170); // petlja za brzo treperenje LED-diode, s periodom od 170ms
 
-		mode = 3; // mode varijabla se postavlja na vrednost koja označava režim „REVERSE“
+		mode = 3; // „mode“ varijabla se postavlja na vrednost koja označava režim „REVERSE“
 		document.getElementById("start").getElementsByTagName("img")[0].src = pauseButton; // na aktivacionom dugmetu se prikazuje simbol "PAUSE"
 		document.getElementById("start-tip").innerHTML = langArray["pause tip"]; // help tip se postavlja na „pauziranje simulacije“
 		a = document.getElementById("speed").value; // podešavanje brzine na osnovu položaja klizača brzine
@@ -325,10 +382,10 @@ function reverse() { // vraća simulaciju unazad
 	}
 }
 
-function afterReverse() { // reaktivacija dugmadi i opcija nakon završetka režima „REVERSE“
-	document.getElementById("random").className = ""; // aktiviranje help-tipa za regulator gustine random rasporeda
+// reaktivacija dugmadi i opcija nakon završetka režima „REVERSE“
+function afterReverse() {
+	document.getElementById("random").className = ""; // prikazivanje fonta regulatora gustine random rasporeda crnom (aktivnom) bojom
 	document.getElementById("density").disabled = false;
-	document.getElementsByClassName("commands1")[0].getElementsByTagName("ul")[0].className = ""; // aktiviranje help-tipa za tastere predefinisanih sadržaja
 	document.getElementById("white").disabled = false;
 	document.getElementById("black").disabled = false;
 	document.getElementById("hor").disabled = false;
@@ -338,14 +395,15 @@ function afterReverse() { // reaktivacija dugmadi i opcija nakon završetka rež
 	document.getElementById("inverse").disabled = false;
 	document.getElementById("step").disabled = false;
 	stepAct(); // aktivacija dugmeta „FRAME ADVANCE“
-	document.getElementById("edge").className = "";
+	document.getElementById("edge").className = ""; // prikazivanje fonta opcije „edge“ crnom (aktivnom) bojom
 	document.getElementById("edge1").disabled = false;
 	document.getElementById("edge2").disabled = false;
 }
 
-function setSpeed() { // podešavanje brzine na osnovu položaja klizača brzine i ponavljanje radne petlje
+// podešavanje brzine na osnovu položaja klizača brzine i ponavljanje radne petlje
+function setSpeed() {
 	a = document.getElementById("speed").value; // podešavanje brzine na osnovu položaja klizača brzine
-	b = 1361 - 150 * a;
+	b = 1361 - 150 * a; // najmanjoj brzini (a=1) odgovara najveći period (b=1211), dok najvećoj brzini (a=9) odgovara najmanji period (b=11)
 	if (mode == 1) {
 		runLoop = setInterval(step, b); // ponavljanje radne petlje (za režim „PLAY“)
 	} else {
@@ -353,31 +411,34 @@ function setSpeed() { // podešavanje brzine na osnovu položaja klizača brzine
 	}
 }
 
-function run() { // Prelazak u režim „PLAY“ ili „PAUSE“
-	if (mode == 1 || mode == 3) { // ako je režim bio „PLAY“ ili „REVERSE“, prelazak u režim „PAUSE“
+// Prelazak u režim „PLAY“ ili „PAUSE“
+function run() {
+	// ako je režim bio „PLAY“ ili „REVERSE“, prelazak u režim „PAUSE“
+	if (mode == 1 || mode == 3) {
 		clearInterval(runLoop); // zaustavlja se radna petlja
-		document.getElementById("start").getElementsByTagName("img")[0].src = playPauseButton; // na aktivacionom dugmetu se prikazuju simboli "PLAY" i "PAUSE"
+		document.getElementById("start").getElementsByTagName("img")[0].src = playPauseButton; // na aktivacionom dugmetu se prikazuje simbol "PLAY/PAUSE"
 		document.getElementById("start-tip").innerHTML = langArray["cont tip"]; // help tip se postavlja na „nastavljanje simulacije“
 		document.getElementById("step").disabled = false; // ponovo se aktivira dugme „FRAME ADVANCE“ (koje je bilo deaktivirano tokom režima „PLAY“)
 		document.getElementById("step").getElementsByTagName("img")[0].src = stepButton; // ponovo se aktivira i slika njegovog simbola na tasteru
-		document.getElementById("step-tip").className = "tip"; // samim tim, pošto je dugme aktivirano, treba da se hoverom na njega ispisuje i help tip
 		if (counter > 0) { // ukoliko nismo na nultom koraku simulacije...
 			reverseAct(); // ...aktivacija dugmeta za vraćanje simulacije unazad
 			stepRevAct(); // takođe, aktivacija dugmeta za prethodni korak simulacije
 		}
-		document.getElementById("led").className = "led-off"; // LED se isključuje pre započinjanja treperućeg režima
+		document.getElementById("led").className = "led-off"; // LED se isključuje pre započinjanja sporog treperućeg režima
 		if (mode = 3) { // ako je režim bio „REVERSE“...
-			clearInterval(ledLoop); // ...zaustavlja se treperenje diode...
+			clearInterval(ledLoop); // ...zaustavlja se brzo treperenje LED-diode...
 			ledLoop = 0; // ...i varijabla timing-eventa treperenja se postavlja na nulu
 			afterReverse(); // reaktivacija dugmadi i opcija nakon završetka režima „REVERSE“
 		}
-		ledFlag = 0; // pre ulaska u petlju za treperenje postavljamo indikator da je LED isključena
-		ledLoop = setInterval(ledBlink, 500); // petlja za treperenje LED-diode, s periodom od 500ms
+		ledFlag = 0; // pre ulaska u petlju za sporo treperenje postavljamo indikator da je LED isključena
+		ledLoop = setInterval(ledBlink, 500); // petlja za sporo treperenje LED-diode, s periodom od 500ms
 		mode = 2; // flag radnog režima se postavlja na vrednost koji označava režim „PAUSE“
 	}
-	else { // Ako je režim bio „STOP“ ili „PAUSE“, onda prelazak u režim „PLAY“
+	
+	// Ako je režim bio „STOP“ ili „PAUSE“, onda prelazak u režim „PLAY“
+	else {
 		if (mode == 2) { // u slučaju da je režim bio „PAUSE“...
-			clearInterval(ledLoop); // ...zaustavlja se treperenje diode...
+			clearInterval(ledLoop); // ...zaustavlja se sporo treperenje LED-diode...
 			ledLoop = 0; // ...i varijabla timing-eventa treperenja se postavlja na nulu
 		}
 		mode = 1; // flag radnog režima se postavlja na vrednost koji označava režim „PLAY“
@@ -386,12 +447,12 @@ function run() { // Prelazak u režim „PLAY“ ili „PAUSE“
 		document.getElementById("led").className = "led-on"; // LED se uključuje
 		document.getElementById("step").disabled = true; // za vreme režima „PLAY“, dugme „FRAME ADVANCE“ je deaktivirano
 		document.getElementById("step").getElementsByTagName("img")[0].src = stepButtonDisabled; // deaktivira se i slika njegovog simbola na tasteru
-		document.getElementById("step-tip").className = "tip-deact"; // samim tim, pošto je dugme deaktivirano, hoverom na njega ne treba da se ispisuje help tip
 		reverseDeact(); // deaktivacija dugmeta za vraćanje simulacije unazad
 		stepRevDeact(); // deaktivacija dugmeta za prethodni korak simulacije
 		setSpeed(); // podešavanje brzine na osnovu položaja klizača brzine i ponavljanje radne petlje
 	}
 }
+
 
 // Aktivacija i deaktivacija dugmadi
 
@@ -399,45 +460,40 @@ function run() { // Prelazak u režim „PLAY“ ili „PAUSE“
 function stepRevAct() {
 	document.getElementById("step-rev").disabled = false; // aktivira se dugme „PREVIOUS FRAME“
 	document.getElementById("step-rev").getElementsByTagName("img")[0].src = stepRevButton; // aktivira se i slika njegovog simbola na tasteru
-	document.getElementById("step-rev-tip").className = "tip"; // samim tim, pošto je dugme aktivirano, treba da se hoverom na njega ispisuje i help tip
 }
 
 // deaktivacija dugmeta „PREVIOUS FRAME“
 function stepRevDeact() {
 	document.getElementById("step-rev").disabled = true; // deaktivira se dugme „PREVIOUS FRAME“
 	document.getElementById("step-rev").getElementsByTagName("img")[0].src = stepRevButtonDisabled; // deaktivira se i slika njegovog simbola na tasteru
-	document.getElementById("step-rev-tip").className = "tip-deact"; // samim tim, pošto je dugme deaktivirano, hoverom na njega ne treba da se ispisuje help tip
 }
 
 // aktivacija dugmeta „REVERSE“
 function reverseAct() {
 	document.getElementById("reverse").disabled = false; // aktivira se dugme „REVERSE“
 	document.getElementById("reverse").getElementsByTagName("img")[0].src = reverseButton; // aktivira se i slika njegovog simbola na tasteru
-	document.getElementById("reverse-tip").className = "tip"; // samim tim, pošto je dugme aktivirano, treba da se hoverom na njega ispisuje i help tip
 }
 
 // deaktivacija dugmeta „REVERSE“
 function reverseDeact() {
 	document.getElementById("reverse").disabled = true; // deaktivira se dugme „REVERSE“
 	document.getElementById("reverse").getElementsByTagName("img")[0].src = reverseButtonDisabled; // deaktivira se i slika njegovog simbola na tasteru
-	document.getElementById("reverse-tip").className = "tip-deact"; // samim tim, pošto je dugme deaktivirano, hoverom na njega ne treba da se ispisuje help tip
 }
 
 // aktivacija dugmeta „FRAME ADVANCE“
 function stepAct() {
 	document.getElementById("step").disabled = false; // aktivira se dugme „FRAME ADVANCE“
 	document.getElementById("step").getElementsByTagName("img")[0].src = stepButton; // aktivira se i slika njegovog simbola na tasteru
-	document.getElementById("step-tip").className = "tip"; // samim tim, pošto je dugme aktivirano, treba da se hoverom na njega ispisuje i help tip
 }
 
 // deaktivacija dugmeta „FRAME ADVANCE“
 function stepDeact() {
 	document.getElementById("step").disabled = true; // deaktivira se dugme „FRAME ADVANCE“
 	document.getElementById("step").getElementsByTagName("img")[0].src = stepButtonDisabled; // deaktivira se i slika njegovog simbola na tasteru
-	document.getElementById("step-tip").className = "tip-deact"; // samim tim, pošto je dugme deaktivirano, hoverom na njega ne treba da se ispisuje help tip
 }
 
-function ledBlink() { // treperenje LED-diode u režimu „PAUSE“
+// treperenje LED-diode u režimima „PAUSE“ i „REVERSE“
+function ledBlink() {
 	if (ledFlag == 1) { // ukoliko je LED uključena...
 		document.getElementById("led").className = "led-off"; // ...isključuje se...
 		ledFlag = 0; // ...i indikator uključene LED se postavlja na nulu
@@ -447,14 +503,16 @@ function ledBlink() { // treperenje LED-diode u režimu „PAUSE“
 	}
 }
 
-function changeSpeed() { // promena brzine u toku simulacije
+// promena brzine u toku simulacije
+function changeSpeed() {
 	if (mode == 1 || mode == 3) { // izvršava se jedino u režimu „PLAY“ ili u režimu „REVERSE“
 		clearInterval(runLoop); // prekida se dosadašnja radna petlja...
 		setSpeed(); // ...i startuje nova, s novopodešenom brzinom
 	}
 }
 
-function changeEdgeMode(newEdge) { // 
+// promena načina na koji se ivice tabele ponašaju
+function changeEdgeMode(newEdge) {
 	edge = newEdge;
 }
 
@@ -483,6 +541,7 @@ function english() {
 	langArray["edge"] = "Table edges behavior";
 	
 	// poruke
+	langArray["resolution error"] = "Unfortunately, your screen resolution is too low to display this simulacion properly.";
 	langArray["random tip"] = "Regulator for the black (alive)<br />cells density in the initial step.<ul><li>Leftmost position – minimal density;</li><li>Rightmost position – maximal density;</li></ul>Keyboard shortcuts: <span class='keyshort'>1–9</span><ul><li>key 1 – minimal density</li><li>key 9 – maximal density</li></ul>";
 	langArray["white tip"] = "Populating the table with<br />all the white (dead) cells.<br />Keyboard shortcut: <span class='keyshort'>A</span>";
 	langArray["black tip"] = "Populating the table with<br />all the black (alive) cells.<br />Keyboard shortcut: <span class='keyshort'>S</span>";
@@ -503,7 +562,7 @@ function english() {
 	langArray["edge tip"] = "The way cells located on the edges<br />of the table behave:<ul><li>mode 1: the table edges act like<br />real, physical walls – there's no<br />anything behind them;</li><li>mode 2: behind the right edge<br />there's the left edge of the table,<br />behind the bottom edge there's<br />the top edge of the table and<br />so on. In other words, the table<br />can be observed as a surface of<br />the sphere, whereby it's right<br />edge is joined with the left edge,<br />likewise the bottom with the top<br />edge.</li></ul>Keyboard shortcut: <span class='keyshort'>L</span>";
 	
 	// help
-	langArray["help"] = "<p>The Game of Life is a very popular game demonstrating how it's possible to obtain ordered structures from an initial chaos, when a few simple rules are obeyed.</p><p>The main object in this game is a table consisting of alive (black) and dead (white) cells, whereby each cell is surrounded by eight other (living or dead) cells. At the very beginning, we arrange the alive and dead cells in a desired, arbitrary way. Some of the predefined layouts can be obtained using the available buttons (All whites, All blacks...), combining with activating/deactivating some cells with the left mouse button, which makes it possible to manualy draw some objects. There is, also, an option of generating a random layout (with the random slider).</p><p>After setting up the table, the simulation can be run in two ways – by going step by step pressing the "+'"'+"one-step"+'"'+" button for every new simulation step, or by pressing the "+'"'+"start"+'"'+" button which runs the automated simulation.</p><p>The rules the simulation is based on are the following:<ul><li>if a cell is surrounded by less than two alive cells, or is surrounded by more than three alive cells, in the next step it's dead due to the loneliness (in the first case), or due to the overpopulation (in the second case);</li><li>if a cell is surrounded by exactly two alive cells, in the next step it doesn't change its status (the alive cell stays alive, the dead cell stays dead);</li><li>if a cell is surrounded by exactly three alive cells, in the next step it's alive.</li></ul><p>Or, from the standpoint of cell's survival, these rules can be formulated in a slightly different form:</p><ul><li>if a cell is dead, in the next step it becomes alive if and only if it's surrounded by exactly three alive cells;</li><li>if a cell is alive, in the next step it stays alive if and only if it's surrounded by exactly two or by exactly three alive cells.</li></ul></p><p>Keyboard shortcuts:</p><ul>Populating the table with predefined content:<li><span class='keyshort'>1–9</span> – random layout – 1 is for the minimal density, 9 is for the maximal density;</li><li><span class='keyshort'>A</span> – all white cells;</li><li><span class='keyshort'>S</span> – all black cells;</li><li><span class='keyshort'>D</span> – a form of horizontal bars;</li><li><span class='keyshort'>F</span> – a form of vertical bars;</li><li><span class='keyshort'>G</span> – a form of diagonal bars;</li><li><span class='keyshort'>H</span> – a chess-shaped form;</li><li><span class='keyshort'>I</span> – making the inverse of the current layout.</li></ul><ul>Commands:<li><span class='keyshort'>X</span> – runs the simulation backwards;</li><li><span class='keyshort'>C</span> – one simulation step back;</li><li><span class='keyshort'>V</span> – one simulation step advance;</li><li><span class='keyshort'>B</span> – running/pausing the simulation;</li><li><span class='keyshort'>N</span> – slowing down the simulation running;</li><li><span class='keyshort'>M</span> – accelerating the simulation running;</li><li><span class='keyshort'>K</span> – status changes are displayed in color;</li><li><span class='keyshort'>L</span> – table edges behavior.</li></ul><p>A detailed description of a particular option can be seen by hovering a button/regulator/checkbox for that option.</p>";
+	langArray["help"] = "<p>The Game of Life is a very popular game demonstrating how it's possible to obtain ordered structures from an initial chaos, when a few simple rules are obeyed.</p><p>The main object in this game is a table consisting of alive (black) and dead (white) cells, whereby each cell is surrounded by eight other (living or dead) cells. At the very beginning, we arrange the alive and dead cells in a desired, arbitrary way. Some of the predefined layouts can be obtained using the available buttons (All whites, All blacks...), combining with activating/deactivating some cells with the left mouse button, which makes it possible to manualy draw some objects. There is, also, an option of generating a random layout (with the random slider).</p><p>After setting up the table, the simulation can be run in two ways – by going step by step pressing the "+'"'+"one-step"+'"'+" button for every new simulation step, or by pressing the "+'"'+"start"+'"'+" button which runs the automated simulation.</p><p>The rules the simulation is based on are the following:<ul><li>if a cell is surrounded by less than two alive cells, or is surrounded by more than three alive cells, in the next step it's dead due to the loneliness (in the first case), or due to the overpopulation (in the second case);</li><li>if a cell is surrounded by exactly two alive cells, in the next step it doesn't change its status (the alive cell stays alive, the dead cell stays dead);</li><li>if a cell is surrounded by exactly three alive cells, in the next step it's alive.</li></ul><p>Or, from the standpoint of cell's survival, these rules can be formulated in a slightly different form:</p><ul><li>if a cell is dead, in the next step it becomes alive if and only if it's surrounded by exactly three alive cells;</li><li>if a cell is alive, in the next step it stays alive if and only if it's surrounded by exactly two or by exactly three alive cells.</li></ul></p><p>Keyboard shortcuts:</p><ul>Populating the table with predefined content:<li><span class='keyshort'>1–9</span> – random layout – 1 is for the minimal density, 9 is for the maximal density;</li><li><span class='keyshort'>A</span> – all white cells;</li><li><span class='keyshort'>S</span> – all black cells;</li><li><span class='keyshort'>D</span> – a form of horizontal bars;</li><li><span class='keyshort'>F</span> – a form of vertical bars;</li><li><span class='keyshort'>G</span> – a form of diagonal bars;</li><li><span class='keyshort'>H</span> – a chess-shaped form;</li><li><span class='keyshort'>I</span> – making the inverse of the current layout.</li></ul><ul>Commands:<li><span class='keyshort'>X</span> – running the simulation backwards;</li><li><span class='keyshort'>C</span> – one simulation step back;</li><li><span class='keyshort'>V</span> – one simulation step advance;</li><li><span class='keyshort'>B</span> – running/pausing the simulation;</li><li><span class='keyshort'>N</span> – slowing down the simulation running;</li><li><span class='keyshort'>M</span> – accelerating the simulation running;</li><li><span class='keyshort'>K</span> – status changes are displayed in color;</li><li><span class='keyshort'>L</span> – table edges behavior.</li></ul><p>A detailed description of a particular option can be seen by hovering a button/regulator/checkbox for that option.</p>";
 	
 	document.getElementById("eng").className = "selected"; // simbol izabranog jezika treba da bude uokviren i da na njemu kursor miša bude default
 	document.getElementById("srb").className = ""; // simbol neizabranog jezika treba da bude neuokviren i da na njemu kursor miša bude pointer
@@ -535,6 +594,7 @@ function serbian() {
 	langArray["edge"] = "Ponašanje ivica tabele";
 	
 	// poruke
+	langArray["resolution error"] = "Nažalost, rezolucija Vašeg ekrana je suviše mala za ispravno prikazivanje ove simulacije.";
 	langArray["random tip"] = "Regulator gustine crnih (živih) ćelija<br />u početnom koraku.<ul><li>Krajnji levi položaj – najmanja gustina;</li><li>Krajnji desni položaj – najveća gustina;</li></ul>Prečice na tastaturi: <span class='keyshort'>1–9</span><ul><li>taster 1 – najmanja gustina</li><li>taster 9 – najveća gustina</li></ul>";
 	langArray["white tip"] = "Popunjavanje tabele svim<br />belim (mrtvim) ćelijama.<br />Prečica na tastaturi: <span class='keyshort'>A</span>";
 	langArray["black tip"] = "Popunjavanje tabele svim<br />crnim (živim) ćelijama.<br />Prečica na tastaturi: <span class='keyshort'>S</span>";
@@ -562,7 +622,8 @@ function serbian() {
 	writeLang(langArray); // pozivanje funkcija za prikaz natpisa i poruka
 }
 
-function writeLang() { // prikazivanje natpisa i poruka na izabranom jeziku, na osnovu sadržaja niza langArray[]
+// prikazivanje natpisa i poruka na izabranom jeziku, na osnovu sadržaja niza langArray[]
+function writeLang() {
 	
 	// naslov
 	document.getElementsByTagName("title")[0].innerHTML = langArray["title"];
@@ -586,6 +647,7 @@ function writeLang() { // prikazivanje natpisa i poruka na izabranom jeziku, na 
 	document.getElementById("edge").getElementsByTagName("span")[0].innerHTML = langArray["edge"];
 	
 	// poruke
+	document.getElementsByTagName("h2")[0].innerHTML = langArray["resolution error"];
 	document.getElementById("random-tip").innerHTML = langArray["random tip"];
 	document.getElementById("white-tip").innerHTML = langArray["white tip"];
 	document.getElementById("black-tip").innerHTML = langArray["black tip"];
@@ -620,52 +682,24 @@ function writeLang() { // prikazivanje natpisa i poruka na izabranom jeziku, na 
 	document.getElementById("help2").innerHTML = langArray["help"];
 }
 
+
+// prečice na tastaturi
 document.onkeypress = key;
 function key(event) {
+	// pribavljanje koda pritisnutog tastera
 	var x = event.which || event.keyCode;
-	if (x >= 49 && x <= 57 && mode != 3) { // pritisnut neki od tastera od 1 do 9, radi regulisanja gustine sadržaja (neaktivno u režimu „REVERSE“)
-		document.getElementById("density").focus(); // stavljanje fokusa na regulator gustine sadržaja
-		switch(x) {
-			case 49: // taster „1“ za random raspored, s klizačem na položaju 1 (najređe raspoređene žive ćelije)
-				document.getElementById("density").value = "1";
-				drawTable(0);
-				break;
-			case 50: // taster „2“ za random raspored, s klizačem na položaju 2
-				document.getElementById("density").value = "2";
-				drawTable(0);
-				break;
-			case 51: // taster „3“ za random raspored, s klizačem na položaju 3
-				document.getElementById("density").value = "3";
-				drawTable(0);
-				break;
-			case 52: // taster „4“ za random raspored, s klizačem na položaju 4
-				document.getElementById("density").value = "4";
-				drawTable(0);
-				break;
-			case 53: // taster „5“ za random raspored, s klizačem na položaju 5
-				document.getElementById("density").value = "5";
-				drawTable(0);
-				break;
-			case 54: // taster „6“ za random raspored, s klizačem na položaju 6
-				document.getElementById("density").value = "6";
-				drawTable(0);
-				break;
-			case 55: // taster „7“ za random raspored, s klizačem na položaju 7
-				document.getElementById("density").value = "7";
-				drawTable(0);
-				break;
-			case 56: // taster „8“ za random raspored, s klizačem na položaju 8
-				document.getElementById("density").value = "8";
-				drawTable(0);
-				break;
-			case 57: // taster „9“ za random raspored, s klizačem na položaju 9 (najgušće raspoređene žive ćelije)
-				document.getElementById("density").value = "9";
-				drawTable(0);
-				break;
-		}
+
+	// pritisnut neki od tastera od 1 do 9, radi regulisanja gustine random rasporeda (neaktivno u režimu „REVERSE“)
+	if (x >= 49 && x <= 57 && mode != 3) {
+		document.getElementById("density").focus(); // stavljanje fokusa na regulator gustine random rasporeda
+		densityValue = x - 48; // za tastere 1–9 vrednost njihovog koda je za 48 veća od njihove vrednosti – prema tome, od koda tastera treba oduzeti 48 (npr. kôd za taster 3 je 51, oduzmemo 48 i dobijemo 3)
+		document.getElementById("density").value = densityValue; // regulator se namešta na onu poziciju koja odgovara pritisnutom tasteru 1–9
+		drawTable(0); // crtanje tabele (argument 0 znači da se crta random raspored)
 	}
+
+	// pritisnut neki od tastera za regulaciju brzine simulacije
 	if (x == 110 || x == 109) {
-		document.getElementById("speed").focus(); // stavljanje fokusa na odgovarajuće dugme
+		document.getElementById("speed").focus(); // stavljanje fokusa na regulator brzine simulacije
 		if (x == 110) { // taster „N“ za usporavanje simulacije
 			var speed = document.getElementById("speed").value;
 			if (speed > 1) { // Ako klizač regulatora brzine nije na krajnjoj levoj poziciji...
@@ -682,19 +716,22 @@ function key(event) {
 			}
 		}
 	}
-	if(mode !=3) { // komande koje su neaktivne tokom režima „REVERSE“
+
+	if(mode != 3) { // komande koje su neaktivne tokom režima „REVERSE“
 		switch(x) {
-			case 108: // taster „L“ za izbor ponašanja ivica tabele
+			// taster „L“ za izbor ponašanja ivica tabele
+			case 108:
 				if(edge) { // ako je bilo postavljeno na mode 1, prebaciti na mode 0
 					document.getElementById("edge1").checked = true; // odabir odgovarajučeg radio-buttona
-					document.getElementById("edge1").focus(); // stavljanje fokusa na odgovarajuće dugme
+					document.getElementById("edge1").focus(); // stavljanje fokusa na odgovarajući radio-button
 				} else { // u suprotnom (ako je bilo postavljeno na mode 0), prebaciti na mode 1
 					document.getElementById("edge2").checked = true; // odabir odgovarajučeg radio-buttona
-					document.getElementById("edge2").focus(); // stavljanje fokusa na odgovarajuće dugme
+					document.getElementById("edge2").focus(); // stavljanje fokusa na odgovarajući radio-button
 				}
 				edge = 1 - edge;
-				displayNewWhileStopPause();
 				break;
+
+			// predefinisani sadržaji tabele
 			case 97: // taster „A“ za tabelu sa svim belim (mrtvim) ćelijama
 				drawTable(1);
 				document.getElementById("white").focus(); // stavljanje fokusa na odgovarajuće dugme
@@ -719,24 +756,28 @@ function key(event) {
 				drawTable(6);
 				document.getElementById("chess").focus(); // stavljanje fokusa na odgovarajuće dugme
 				break;
-			case 105: // taster „I“ za inverzni raspored (da sve bele ćelije postanu crne i obratno)
+
+			// inverzni raspored (da sve bele ćelije postanu crne i obratno)
+			case 105: // pritisnut taster „I“
 				inverse();
 				document.getElementById("inverse").focus(); // stavljanje fokusa na odgovarajuće dugme
 				break;
+
+			// radne komande
 			case 120: // taster „X“ za simulaciju unazad
-				if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „STOP“ i „PAUSE“, kao i pre izvršenja prvog koraka simulacije, opcija za simulaciju unazad je onemogućena
+				if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „PLAY“ i „REVERSE“, kao i pre izvršenja prvog koraka simulacije, opcija za simulaciju unazad je onemogućena
 					reverse();
 					document.getElementById("reverse").focus(); // stavljanje fokusa na odgovarajuće dugme
 				}
 				break;
 			case 99: // taster „C“ za vraćanje jednog koraka simulacije
-				if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „STOP“ i „PAUSE“, kao i pre izvršenja prvog koraka simulacije, opcija za jedan korak simulacije je onemogućena
+				if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „PLAY“ i „REVERSE“, kao i pre izvršenja prvog koraka simulacije, opcija za jedan korak simulacije je onemogućena
 					stepRev();
 					document.getElementById("step-rev").focus(); // stavljanje fokusa na odgovarajuće dugme
 				}
 				break;
 			case 118: // taster „V“ za izvršavanje jednog koraka simulacije
-				if (mode != 1) { // u režimu „PLAY“ (mode=1) opcija za jedan korak simulacije je onemogućena
+				if (mode != 1 || mode != 3) { // u režimima „PLAY“ (mode=1) i „REVERSE“ (mode=3) opcija za jedan korak simulacije je onemogućena
 					oneStep();
 					document.getElementById("step").focus(); // stavljanje fokusa na odgovarajuće dugme
 				}
@@ -755,7 +796,7 @@ function key(event) {
 				document.getElementById("changes").checked = true;
 			}
 			document.getElementById("changes").focus(); // stavljanje fokusa na odgovarajuće dugme
-			displayNewWhileStopPause();
+			displayNew();
 			break;
 	}
 }
