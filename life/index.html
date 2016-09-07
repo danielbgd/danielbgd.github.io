@@ -6,20 +6,21 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <meta http-equiv="content-style-type" content="text/css" />
 <meta http-equiv="content-language" content="sr" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta name="author" content="">
 <meta name="resource-type" content="document" />
 <meta name="distribution" content="global" />
-<meta name="keywords" content="the game of life" />
-<meta name="description" content="The Game of Life" />
+<meta name="keywords" content="igra zivota" />
+<meta name="description" content="Igra života" />
 <meta name="robots" content="index, follow" />
 <meta property="og:image" content="" />
-<meta property="og:title" content="The Game of Life" />
+<meta property="og:title" content="Igra života" />
 <meta property="og:url" content="" />
-<meta property="og:site_name" content="The Game of Life" />
+<meta property="og:site_name" content="Igra života" />
 <meta property="og:type" content="website" />
-<meta property="og:description" content="The Game of Life" />
+<meta property="og:description" content="Igra života" />
 
-<title>The Game of Life</title>
+<title>Igra života</title>
 
 <script src="life.js"></script>
 
@@ -29,22 +30,24 @@
 
 </head>
 
-<body onload="init()" onmouseup="mouseUp()">
+<body onload="init()" onmouseup="tableMouseUp()">
 
 <div class="container">
-	<h1>The Game of Life</h1>
+	<h1>Igra života</h1>
+
+	<h2>Nažalost, rezolucija Vašeg ekrana je suviše mala za ispravno prikazivanje ove simulacije.</h2>
 
 	<!-- help -->
 	<span id="help">?
-		<span id="help2"></span>
+		<span id="help2"><p>Igra života je veoma popularna igra koja demonstrira kako je moguće iz početnog haosa dobiti uređene strukture, kada je ispunjeno nekoliko jednostavnih pravila.</p><p>Glavni objekt ove igre je tabela koja se sastoji od živih (crnih) i mrtvih (belih) ćelija, pri čemu je svaka ćelija okružena sa osam drugih (živih ili mrtvih) ćelija. Na samom početku, raspoređujemo žive i mrtve ćelije na željen, proizvoljan način. Neki od predefinisanih rasporeda mogu se postići upotrebom dostupnih dugmeta (Sve bele, Sve crne...), u kombinaciji s aktiviranjem/deaktiviranjem nekih ćelija levim klikom miša, čime je omogućeno ručno crtanje nekih objekata. Postoji, takođe, opcija generisanja random rasporeda (pomoću random klizača).</p><p>Nakon postavljanja tabele, simulacija se može izvršiti na dva načina – idući korak po korak pritiskanjem „one-step“ dugmeta za svaki novi korak simulacije, ili pritiskom na „start“ dugme čime se pokreće automatizovana simulacija.</p><p>Pravila po kojima se simulacija izvršava jesu sledeća:<ul><li>ako je ćelija okružena s manje od dve žive ćelije, ili je okružena s više od tri žive ćelije, u sledećem koraku ona je mrtva usled usamljenosti (u prvom slučaju), ili usled prenaseljenosti (u drugom slučaju);</li><li>ako je ćelija okružena s tačno dve žive ćelije, u sledećem koraku ne menja svoj status (živa ćelija ostaje živa, mrtva ćelija ostaje mrtva);</li><li>ako je ćelija okružena s tačno tri žive ćelije, u sledećem koraku ona je živa.</li></ul><p>Ili, sa stanovišta opstanka ćelije, ova pravila se mogu formulisati u nešto drugačijem obliku:</p><ul><li>ako je ćelija mrtva, u sledećem koraku ona oživljava ako i samo ako je okružena s tačno tri žive ćelije;</li><li>ako je ćelija živa, u sledećem koraku ona ostaje živa ako i samo ako je okružena s tačno dve ili s tačno tri žive ćelije.</li></ul></p><p>Prečice na tastaturi:</p><ul>Popunjavanje tabele predefinisanim sadržajem:<li><span class='keyshort'>1–9</span> – random raspored – 1 je za najmanju gustinu, 9 je za najveću gustinu;</li><li><span class='keyshort'>A</span> – sve bele ćelije;</li><li><span class='keyshort'>S</span> – sve crne ćelije;</li><li><span class='keyshort'>D</span> – raspored u vidu horizontalnih pruga;</li><li><span class='keyshort'>F</span> – raspored u vidu vertikalnih pruga;</li><li><span class='keyshort'>G</span> – raspored u vidu dijagonalnih pruga;</li><li><span class='keyshort'>H</span> – raspored u vidu šahovskih polja;</li><li><span class='keyshort'>I</span> – pravljenje inverznog rasporeda u odnosu na trenutni.</li></ul><ul>Komande:<li><span class='keyshort'>X</span> – pokretanje simulacije unazad;</li><li><span class='keyshort'>C</span> – jedan korak simulacije nazad;</li><li><span class='keyshort'>V</span> – jedan korak simulacije napred;</li><li><span class='keyshort'>B</span> – pokretanje/pauziranje simulacije;</li><li><span class='keyshort'>N</span> – usporavanje simulacije;</li><li><span class='keyshort'>M</span> – ubrzavanje simulacije;</li><li><span class='keyshort'>K</span> – promene statusa se prikazuju u boji;</li><li><span class='keyshort'>L</span> – ponašanje ivica tabele.</li></ul><p>Detaljan opis svake opcije može se videti prelaskom kursora miša preko dugmeta/regulatora/checkboxa za tu opciju.</p></span>
 	</span>
-	
+
 	<!-- izbor jezika prikaza -->
 	<ul class="languages">
-		<li><img id="eng" src="images/eng.png" alt="English language" title="Switch to English language" onclick="english()" /></li>
 		<li><img id="srb" src="images/srb.png" alt="Srpski jezik" title="Prebaci na srpski jezik" onclick="serbian()" /></li>
+		<li><img id="eng" src="images/eng.png" alt="English language" title="Switch to English language" onclick="english()" /></li>
 	</ul>
-	
+
 	<!-- prikaz tabele -->
 	<table id="table"></table>
 	<br />
@@ -53,18 +56,18 @@
 	<div class="counter-random">
 
 		<!-- prikazivanje brojača koraka -->
-		<div id="counter"></div>
-		
+		<div id="counter">Redni broj koraka:</div>
+
 		<!-- deo za odabir inicijalnog random rasporeda -->
 		<div id="random">
 			<ul>
 				<li>
-					<strong id="rand"></strong>&nbsp;&nbsp;&nbsp;&nbsp;
+					<strong id="rand">Random raspored:</strong>&nbsp;&nbsp;&nbsp;&nbsp;
 				</li>
 				<li>
 					<!-- regulator gustine inicijalnog random rasporeda -->
-					<span id="rand-thin"></span><input id="density" type="range" min="1" max="9" step="1" value="5" onmouseup="drawTable(0)"><span id="rand-thick"></span>
-					<span id="random-tip" class="tip"></span>
+					<span id="rand-thin">retko</span><input id="density" type="range" min="1" max="9" step="1" onmousedown="setTimeout(densityMouseDown, 0)" onmouseup="densityMouseUp()"><span id="rand-thick">gusto</span>
+					<span id="random-tip" class="tip">Regulator gustine crnih (živih) ćelija<br />u početnom koraku.<ul><li>Krajnji levi položaj – najmanja gustina;</li><li>Krajnji desni položaj – najveća gustina;</li></ul>Prečice na tastaturi: <span class='keyshort'>1–9</span><ul><li>taster 1 – najmanja gustina</li><li>taster 9 – najveća gustina</li></ul></span>
 				</li>
 			</ul>
 		</div>
@@ -75,41 +78,41 @@
 		<ul>
 			<li>
 				<!-- dugme za prikazivanje svih belih ćelija tabele -->
-				<button id="white" onclick="drawTable(1)"></button>
-				<span id="white-tip" class="tip"></span>
+				<button id="white" onclick="drawTable(1)">Sve bele</button>
+				<span id="white-tip" class="tip">Popunjavanje tabele svim<br />belim (mrtvim) ćelijama.<br />Prečica na tastaturi: <span class='keyshort'>A</span></span>
 			</li>
 			<li>
 				<!-- dugme za prikazivanje svih crnih ćelija tabele -->
-				<button id="black" onclick="drawTable(2)"></button>
-				<span id="black-tip" class="tip"></span>
+				<button id="black" onclick="drawTable(2)">Sve crne</button>
+				<span id="black-tip" class="tip">Popunjavanje tabele svim<br />crnim (živim) ćelijama.<br />Prečica na tastaturi: <span class='keyshort'>S</span></span>
 			</li>
 			<li>
 				<!-- dugme za prikazivanje horizontalnih pruga -->
-				<button id="hor" onclick="drawTable(3)"></button>
-				<span id="hor-tip" class="tip"></span>
+				<button id="hor" onclick="drawTable(3)">Horizontalne pruge</button>
+				<span id="hor-tip" class="tip">Raspoređivanje živih i mrtvih ćelija<br />u vidu horizontalnih pruga<br />(svaki neparni red – žive ćelije;<br />svaki parni red – mrtve ćelije).<br />Prečica na tastaturi: <span class='keyshort'>D</span></span>
 			</li>
 			<li>
 				<!-- dugme za prikazivanje vertikalnih pruga -->
-				<button id="vert" onclick="drawTable(4)"></button>
-				<span id="vert-tip" class="tip"></span>
+				<button id="vert" onclick="drawTable(4)">Vertikalne pruge</button>
+				<span id="vert-tip" class="tip">Raspoređivanje živih i mrtvih ćelija<br />u vidu vertikalnih pruga<br />(svaka neparna kolona – žive ćelije;<br />svaka parna kolona – mrtve ćelije).<br />Prečica na tastaturi: <span class='keyshort'>F</span></span>
 			</li>
 			<li>
 				<!-- dugme za prikazivanje dijagonalnih pruga -->
-				<button id="diag" onclick="drawTable(5)"></button>
-				<span id="diag-tip" class="tip"></span>
+				<button id="diag" onclick="drawTable(5)">Dijagonalne pruge</button>
+				<span id="diag-tip" class="tip">Raspoređivanje živih i mrtvih ćelija<br />u vidu dijagonalnih pruga.<br />Prečica na tastaturi: <span class='keyshort'>G</span></span>
 			</li>
 			<li>
 				<!-- dugme za prikazivanje šahovskog rasporeda -->
-				<button id="chess" onclick="drawTable(6)"></button>
-				<span id="chess-tip" class="tip"></span>
+				<button id="chess" onclick="drawTable(6)">Šahovski raspored</button>
+				<span id="chess-tip" class="tip">Raspoređivanje živih<br />i mrtvih ćelija u vidu<br />polja na šahovskoj tabli.<br />Prečica na tastaturi: <span class='keyshort'>H</span></span>
 			</li>
 			<li>
 				&nbsp;&nbsp;&nbsp;&nbsp;
 			</li>
 			<li>
 				<!-- dugme za prikazivanje inverznog raporeda -->
-				<button id="inverse" onclick="inverse()"></button>
-				<span id="inverse-tip" class="tip"></span>
+				<button id="inverse" onclick="inverse()">Inverzan raspored</button>
+				<span id="inverse-tip" class="tip">Zamena svih crnih (živih) ćelija<br />belim (mrtvim) ćelijama i obratno;<br />nakon ovoga, brojač koraka<br />simulacije se vraća na nulu,<br />budući da ovime počinje<br />nova simulacija.<br />Prečica na tastaturi: <span class='keyshort'>I</span></span>
 			</li>
 		</ul>
 	</div>
@@ -122,21 +125,21 @@
 				<button id="reverse" onclick="reverse()">
 					<img src="images/reverse-disabled.png" alt="reverse" width="auto" height=18 />
 				</button>
-				<span id="reverse-tip" class="tip"></span>
+				<span id="reverse-tip" class="tip">Vraćanje simulacije unazad.<br />Prečica na tastaturi: <span class='keyshort'>X</span></span>
 			</li>
 			<li>
 				<!-- dugme za prethodni korak simulacije -->
 				<button id="step-rev" onclick="stepRev()">
 					<img src="images/step-rev-disabled.png" alt="previous frame" width="auto" height=18 />
 				</button>
-				<span id="step-rev-tip" class="tip"></span>
+				<span id="step-rev-tip" class="tip">Vraćanje za jedan<br />korak simulacije.<br />Prečica na tastaturi: <span class='keyshort'>C</span></span>
 			</li>
 			<li>
 				<!-- dugme za jedan korak simulacije -->
 				<button id="step" onclick="oneStep()">
 					<img src="images/step.png" alt="frame advance" width="auto" height=18 />
 				</button>
-				<span id="step-tip" class="tip"></span>
+				<span id="step-tip" class="tip">Izvršavanje jednog<br />koraka simulacije.<br />Prečica na tastaturi: <span class='keyshort'>V</span></span>
 			</li>
 			<li>
 				&nbsp;&nbsp;
@@ -144,37 +147,37 @@
 			<li>
 				<!-- dugme za startovanje/pauziranje/nastavljanje simulacije -->
 				<button id="start" onclick="run()"><img src="images/play.png" alt="play/pause" width="auto" height=18 /></button>
-				<span id="start-tip" class="tip"></span>
+				<span id="start-tip" class="tip">Pokretanje simulacije.<br />Prečica na tastaturi: <span class='keyshort'>B</span></span>
 			</li>
 			<li>
 				<!-- LED-dioda -->
 				<div id="led" class="led-off"></div>
-				<span id="led-tip" class="tip"></span>
+				<span id="led-tip" class="tip">Indikator režima rada:<ul><li>isključeno: režim „STOP“</li><li>uključeno: režim „PLAY“</li><li>sporo treperenje: režim „PAUSE“</li><li>brzo treperenje: režim „REVERSE“</li></ul></span>
 			</li>
 			<li>
 				&nbsp;&nbsp;&nbsp;&nbsp;
 			</li>
 			<li>
 				<!-- regulator brzine simulacije -->
-				<span id="slow">sporo</span><input id="speed" type="range" min="1" max="9" step="1" value="5" onmouseup="changeSpeed()"><span id="fast">brzo</span>
-				<span id="speed-tip" class="tip"></span>
+				<span id="slow">sporo</span><input id="speed" type="range" min="1" max="9" step="1" onmousedown="setTimeout(speedMouseDown, 0)" onmouseup="speedMouseUp()"><span id="fast">brzo</span>
+				<span id="speed-tip" class="tip">Regulator brzine simulacije:<ul><li>Krajnji levi položaj – najmanja brzina</li><li>Krajnji desni položaj – najveća brzina</li></ul>Prečice na tastaturi:<br /><ul><li><span class='keyshort'>N</span> (smanjivanje brzine)</li><li><span class='keyshort'>M</span> (povećavanje brzine)</li></ul></span>
 			</li>
 			<li>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			</li>
 			<li>
 				<!-- opcija da se promene prikazuju u boji -->
-				<label><input type="checkbox" id="changes" name="changes" onclick="displayNewWhileStopPause()"><span id="changes-in-color"></span></label>
-				<span id="changes-tip" class="tip"></span>
+				<label><input type="checkbox" id="changes" name="changes" onclick="displayNew()"><span id="changes-in-color">Promene statusa se<br />prikazuju u boji</span></label>
+				<span id="changes-tip" class="tip">Kada je ova opcija isključena,<br />ćelije se prikazuju u dve boje:<ul><li>crna: živa</li><li>bela: mrtva</li></ul>Uključenjem ove opcije dodaju se<br />dve nove boje:<ul><li>plava: ćelija je upravo oživela</li><li>žuta: ćelija je upravo umrla</li></ul>Prečica na tastaturi: <span class='keyshort'>K</span></span>
 			</li>
 			<li>
 				<!-- izbor ponašanja ivica tabele -->
 				<span id="edge">
-					<span></span><br />
+					<span>Ponašanje ivica tabele</span><br />
 					<label><input type="radio" name="edge" value=0 id="edge1" onclick="changeEdgeMode(0)" checked>mode 1</label>
 					<label><input type="radio" name="edge" value=1 id="edge2" onclick="changeEdgeMode(1)">mode 2</label>
 				<span>
-				<span id="edge-tip" class="tip"></span>
+				<span id="edge-tip" class="tip">Način na koji se ponašaju ćelije<br />locirane na ivicama tabele:<ul><li>mode 1: ivice tabele se ponašaju<br />kao pravi, fizički zidovi – ne postoji<br />ništa iza njih;</li><li>mode 2: iza desne ivice nalazi se<br />leva ivica tabele, iza donje ivice<br />nalazi se gornja ivica tabele itd.<br />Drugim rečima, tabela se može<br />posmatrati kao površina sfere,<br />pri čemu je njena desna ivica<br />spojena s desnom ivicom, isto<br />tako donja s gornjom ivicom.</li></ul>Prečica na tastaturi: <span class='keyshort'>L</span></span>
 			</li>
 	</div>
 </div>
