@@ -118,10 +118,11 @@ function tableMouseDown(event, x) {
 }
 
 // ako je levi taster miša otpušten, flag „tablemousedown“ treba vratiti na FALSE; ako je desni taster miša otpušten, flag „tablemouserightdown“ treba vratiti na FALSE
-function tableMouseUp() {
+function tableMouseUp(event) {
 	if(event.button == 0 || event.button == 1) { // ukoliko je otpušten levi taster miša (savremeni browseri za pritisnut levi taster miša daju rezultat 0, dok IE8 i ranije verzije daju rezultat 1)...
 		tablemousedown = false; // ...flag pritisnutog levog tastera miša se vraća na FALSE
-	} else if(event.button == 2) { // ukoliko je otpušten desni taster miša...
+	}
+	if(event.button == 2) { // ukoliko je otpušten desni taster miša...
 		tablemouserightdown = false; // ...flag pritisnutog desnog tastera miša se vraća na FALSE
 		document.getElementById("table").className = ''; // briše se klasa kojom je kursor bio postavljen na gumicu za brisanje, tj. kursor se vraća na olovku
 	}
