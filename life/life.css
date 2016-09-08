@@ -105,8 +105,12 @@ table {
 	border: 2px solid #000;
 }
 
-table:hover {
+#table {
 	cursor: url(images/pencil.cur), pointer;
+}
+
+#table.rightclick {
+	cursor: url(images/eraser.cur), pointer;
 }
 
 tr, td {
