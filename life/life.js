@@ -19,6 +19,7 @@ var mode = 0; // flag radnog režima (0 – STOP; 1 – PLAY; 2 – PAUSE; 3 –
 var cellsArray = []; // niz u kojem se čuvaju statusi ćelija
 var edge = 0; // flag za edge-mod (0 – ivice se ponašaju kao fizičke prepreke; 1 – prolaskom kroz svaku ivicu element se pojavljuje na suprotnoj ivici tabele)
 var tablemousedown = false; // ako je levi taster miša stisnut dok je kursor unutar tabele, postavlja se na TRUE; ako je levi taster miša otpušten bilo unutar, bilo van tabele, postavlja se na FALSE; koristi se radi crtanja po tabeli pomoću dragginga
+var tablemouserightdown = false; // ako je desni taster miša stisnut dok je kursor unutar tabele, postavlja se na TRUE; ako je desni taster miša otpušten bilo unutar, bilo van tabele, postavlja se na FALSE; koristi se radi crtanja po tabeli pomoću right-dragginga
 var densityValue = 5; // varijabla koja sadrži vrednost regulatora gustine random rasporeda
 var speedValue = 5; // varijabla koja sadrži vrednost regulatora brzine simulacije
 
@@ -55,7 +56,7 @@ function drawTable(content) {
 		cellHTML += "<tr>"; // pri započinjanju svakog reda tabele na string „cellHTML“ dodajemo otvarajući HTML-tag za red tabele
 		for (j = 1; j <= n; j++) { // petlja po kolonama tabele
 			cellID++; // redni broj trenutne ćelije se uvećava prilikom svakog prolaska kroz unutrašnju petlju
-			cellHTML += "<td id='" + cellID + "' onmousedown='tableMouseDown(" + cellID + ")' onmouseenter='tableMouseEnter(" + cellID + ")' ondragstart='return false'"; // započinjemo HTML-kôd za ćeliju tabele; onmousedown u slučaju pritiska na levi taster miša postavljaće flag „tablemousedown“ na TRUE i menjaće status ćelije; onmouseenter, u slučaju da je flag „tablemousedown“ postavljen na TRUE i da se kursorom miša prešlo iz jedne ćelije u drugu, menjaće status te ćelije u koju se prešlo; ondragstart='return false' sprečavaće pravi mouse-dragging, jer bi on zbrljao stvari
+			cellHTML += "<td id='" + cellID + "' onmousedown='tableMouseDown(event," + cellID + ")' onmouseenter='tableMouseEnter(" + cellID + ")' ondragstart='return false' oncontextmenu='return false'"; // započinjemo HTML-kôd za ćeliju tabele; onmousedown u slučaju pritiska na levi taster miša postavljaće flag „tablemousedown“ na TRUE i postavljaće status ćelije na „živo“, dok će u slučaju pritiska na desni taster miša postavljati flag „tablemouserightdown“ na TRUE i postavljati status ćelije na „mrtvo“; onmouseenter, u slučaju da je flag „tablemousedown“ ili flag „tablemouserightdown“ postavljen na TRUE i da se kursorom miša prešlo iz jedne ćelije u drugu, postavljaće odgovarajući status te ćelije u koju se prešlo, u zavisnosti od toga koji je flag TRUE (tj. koje je dugme miša pritisnuto); ondragstart='return false' sprečavaće pravi mouse-dragging, jer bi on zbrljao stvari; oncontextmenu='return false' sprečavaće pojavu context-menija prilikom desnog klika dok je kursor unutar tabele
 			var life = false; // privremena varijabla u kojoj čuvamo status koji treba da ima trenutna ćelija (ćelija živa – true; ćelija mrtva – false)
 			switch(content) {
 				case 0: // žive i mrtve ćelije treba da budu random raspoređene
@@ -102,21 +103,38 @@ function drawTable(content) {
 	document.getElementById("table").innerHTML = cellHTML; // unošenje HTML-koda za celu tabelu
 }
 
-// ako je levi taster miša pritisnut unutar tabele, dok je kursor na ćeliji pod rednim brojem x, menja se status te ćelije i flag „tablemousedown“ se postavlja na TRUE
-function tableMouseDown(x) {
-	tablemousedown = true;
-	changeCell(x);
+// ako je levi taster miša pritisnut unutar tabele, dok je kursor na ćeliji pod rednim brojem x, status te ćelije se postavlja na „živo“ i flag „tablemousedown“ se postavlja na TRUE; ako je desni taster miša pritisnut unutar tabele, dok je kursor na ćeliji pod rednim brojem x, status te ćelije se postavlja na „mrtvo“ i flag „tablemouserightdown“ se postavlja na TRUE
+function tableMouseDown(event, x) {
+	if((event.button == 0 || event.button == 1) && !tablemouserightdown) { // ako je pritisnut levi taster miša, a pri tome nije već odranije pritisnut desni taster miša (savremeni browseri za pritisnut levi taster miša daju rezultat 0, dok IE8 i ranije verzije daju rezultat 1)
+		tablemousedown = true; // flag pritisnutog levog tastera miša se postavlja na TRUE
+		document.getElementById(x).className = 'alive'; // odgovarajuća ćelija tabele postavlja se na „živo“
+		cellsArray[counter][x] = 1; // u odgovarajući član globalnog niza „cellsArray[]“ unosi se vrednost 1, koja odgovara statusu „živo“
+	} else if(event.button == 2 && !tablemousedown) { // ako je pritisnut desni taster miša, a pri tome nije već odranije pritisnut levi taster miša
+		tablemouserightdown = true; // flag pritisnutog desnog tastera miša se postavlja na TRUE
+		document.getElementById(x).className = 'dead'; // odgovarajuća ćelija tabele postavlja se na „mrtvo“
+		cellsArray[counter][x] = 0; // u odgovarajući član globalnog niza „cellsArray[]“ unosi se vrednost 0, koja odgovara statusu „mrtvo“
+		document.getElementById("table").className = 'rightclick'; // postavlja se klasa koja će omogućiti da kursor pređe u gumicu za brisanje
+	}
 }
 
-// ako je levi taster miša otpušten, flag „tablemousedown“ treba vratiti na FALSE
+// ako je levi taster miša otpušten, flag „tablemousedown“ treba vratiti na FALSE; ako je desni taster miša otpušten, flag „tablemouserightdown“ treba vratiti na FALSE
 function tableMouseUp() {
-	tablemousedown = false;
+	if(event.button == 0 || event.button == 1) { // ukoliko je otpušten levi taster miša (savremeni browseri za pritisnut levi taster miša daju rezultat 0, dok IE8 i ranije verzije daju rezultat 1)...
+		tablemousedown = false; // ...flag pritisnutog levog tastera miša se vraća na FALSE
+	} else if(event.button == 2) { // ukoliko je otpušten desni taster miša...
+		tablemouserightdown = false; // ...flag pritisnutog desnog tastera miša se vraća na FALSE
+		document.getElementById("table").className = ''; // briše se klasa kojom je kursor bio postavljen na gumicu za brisanje, tj. kursor se vraća na olovku
+	}
 }
 
-// ukoliko se, dok je levi taster miša pritisnut (tj. flag „tablemousedown“ postavljen na TRUE), kursorom miša prešlo iz jedne u drugu ćeliju tabele koja je pod rednim brojem x, tada ćelija u koju se došlo menja svoj status
+// ukoliko se, dok je levi ili desni taster miša pritisnut (tj. flag „tablemousedown“ ili flag „tablemouserightdown“ postavljen na TRUE), kursorom miša prešlo iz jedne u drugu ćeliju tabele koja je pod rednim brojem x, tada se za ćeliju u koju se došlo postavlja novi status, u zavisnosti od toga koje je dugme miša pritisnuto
 function tableMouseEnter(x) {
-	if (tablemousedown) {
-		changeCell(x);
+	if (tablemousedown) { // ako je pritisnuto levo dugme miša
+		document.getElementById(x).className = 'alive'; // odgovarajuća ćelija tabele postavlja se na „živo“
+		cellsArray[counter][x] = 1; // u odgovarajući član globalnog niza „cellsArray[]“ unosi se vrednost 1, koja odgovara statusu „živo“
+	} else if (tablemouserightdown) { // ako je pritisnuto desno dugme miša
+		document.getElementById(x).className = 'dead'; // odgovarajuća ćelija tabele postavlja se na „mrtvo“
+		cellsArray[counter][x] = 0; // u odgovarajući član globalnog niza „cellsArray[]“ unosi se vrednost 0, koja odgovara statusu „mrtvo“
 	}
 }
 
