@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<meta http-equiv="content-language" content="sr" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="author" content="">
+<meta name="resource-type" content="document" />
+<meta name="distribution" content="global" />
+<meta name="keywords" content="the game of life" />
+<meta name="description" content="The Game of Life" />
+<meta name="robots" content="index, follow" />
+<meta property="og:image" content="" />
+<meta property="og:title" content="The Game of Life" />
+<meta property="og:url" content="" />
+<meta property="og:site_name" content="The Game of Life" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="The Game of Life" />
+
+<title>The Game of Life</title>
+
+<script>var imgFolder = "../images/"</script>
+<script src="../life.js"></script>
+
+<link href="../life.css" rel="stylesheet" type="text/css">
+
+<link rel="shortcut icon" href="images/favicon.gif" type="image/x-icon" />
+
+<link rel="alternate" hreflang="sr" href="https://danielbgd.github.io/life/" />
+<link rel="alternate" hreflang="en" href="https://danielbgd.github.io/life/en/" />
+
+</head>
+
+<body onload="init()" onmouseup="tableMouseUp(event)">
+
+<div class="container">
+	<h1>The Game of Life</h1>
+
+	<h2>Unfortunately, your screen resolution is too low to display this simulacion properly.</h2>
+
+	<!-- help -->
+	<span id="help">?
+		<span id="help2"><p>The Game of Life is a very popular game demonstrating how it's possible to obtain ordered structures from an initial chaos, when a few simple rules are obeyed.</p><p>The main object in this game is a table consisting of alive (black) and dead (white) cells, whereby each cell is surrounded by eight other (living or dead) cells. At the very beginning, we arrange the alive and dead cells in a desired, arbitrary way. Some of the predefined layouts can be obtained using the available buttons (All whites, All blacks...), combining with additional activating/deactivating some cells with the left/right mouse button, which makes it possible to manualy draw some objects. There is, also, an option of generating a random layout (with the random slider).</p><p>After setting up the table, the simulation can be run in two ways – by going step by step pressing the "+'"'+"one-step"+'"'+" button for every new simulation step, or by pressing the "+'"'+"start"+'"'+" button which runs the automated simulation.</p><p>The rules the simulation is based on are the following:<ul><li>if a cell is surrounded by less than two alive cells, or is surrounded by more than three alive cells, in the next step it's dead due to the loneliness (in the first case), or due to the overpopulation (in the second case);</li><li>if a cell is surrounded by exactly two alive cells, in the next step it doesn't change its status (the alive cell stays alive, the dead cell stays dead);</li><li>if a cell is surrounded by exactly three alive cells, in the next step it's alive.</li></ul><p>Or, from the standpoint of cell's survival, these rules can be formulated in a slightly different form:</p><ul><li>if a cell is dead, in the next step it becomes alive if and only if it's surrounded by exactly three alive cells;</li><li>if a cell is alive, in the next step it stays alive if and only if it's surrounded by exactly two or by exactly three alive cells.</li></ul></p><p>Keyboard shortcuts:</p><ul>Populating the table with predefined content:<li><span class='keyshort'>1–9</span> – random layout – 1 is for the minimal density, 9 is for the maximal density;</li><li><span class='keyshort'>A</span> – all white cells;</li><li><span class='keyshort'>S</span> – all black cells;</li><li><span class='keyshort'>D</span> – a form of horizontal bars;</li><li><span class='keyshort'>F</span> – a form of vertical bars;</li><li><span class='keyshort'>G</span> – a form of diagonal bars;</li><li><span class='keyshort'>H</span> – a chess-shaped form;</li><li><span class='keyshort'>I</span> – making the inverse of the current layout.</li></ul><ul>Commands:<li><span class='keyshort'>X</span> – running the simulation backwards;</li><li><span class='keyshort'>C</span> – one simulation step back;</li><li><span class='keyshort'>V</span> – one simulation step advance;</li><li><span class='keyshort'>B</span> – running/pausing the simulation;</li><li><span class='keyshort'>N</span> – slowing down the simulation running;</li><li><span class='keyshort'>M</span> – accelerating the simulation running;</li><li><span class='keyshort'>K</span> – status changes are displayed in color;</li><li><span class='keyshort'>L</span> – table edges behavior.</li></ul><p>A detailed description of a particular option can be seen by hovering a button/regulator/checkbox for that option.</p></span>
+	</span>
+
+	<!-- izbor jezika prikaza -->
+	<ul class="languages">
+		<li><a href="javascript:alertClose('The entire table content will be erased. Do you want to continue?', '../');"><img id="srb" src="../images/srb.png" alt="Srpski jezik" title="Prebaci na srpski jezik" /></a></li>
+		<li><img id="eng" src="../images/eng.png" alt="English language" title="English language" class="selected" /></li>
+	</ul>
+
+	<!-- prikaz tabele -->
+	<table id="table"></table>
+	<br />
+
+	<!-- prvi red kontrolne table -->
+	<div class="counter-random">
+
+		<!-- prikazivanje brojača koraka -->
+		<div id="counter">Step count: <span></span></div>
+
+		<!-- deo za odabir inicijalnog random rasporeda -->
+		<div id="random">
+			<ul>
+				<li>
+					<strong id="rand">Random layout:</strong>&nbsp;&nbsp;&nbsp;&nbsp;
+				</li>
+				<li>
+					<!-- regulator gustine inicijalnog random rasporeda -->
+					<span id="rand-thin">thin</span><input id="density" type="range" min="1" max="9" step="1" onmousedown="setTimeout(densityMouseDown, 0)" onmouseup="densityMouseUp()"><span id="rand-thick">thick</span>
+					<span id="random-tip" class="tip">Regulator for the black (alive)<br />cells density in the initial step.<ul><li>Leftmost position – minimal density;</li><li>Rightmost position – maximal density;</li></ul>Keyboard shortcuts: <span class='keyshort'>1–9</span><ul><li>key 1 – minimal density</li><li>key 9 – maximal density</li></ul></span>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- drugi red kontrolne table -->
+	<div class="commands1">
+		<ul>
+			<li>
+				<!-- dugme za prikazivanje svih belih ćelija tabele -->
+				<button id="white" onclick="drawTable(1)">All whites</button>
+				<span id="white-tip" class="tip">Populating the table with<br />all the white (dead) cells.<br />Keyboard shortcut: <span class='keyshort'>A</span></span>
+			</li>
+			<li>
+				<!-- dugme za prikazivanje svih crnih ćelija tabele -->
+				<button id="black" onclick="drawTable(2)">All blacks</button>
+				<span id="black-tip" class="tip">Populating the table with<br />all the black (alive) cells.<br />Keyboard shortcut: <span class='keyshort'>S</span></span>
+			</li>
+			<li>
+				<!-- dugme za prikazivanje horizontalnih pruga -->
+				<button id="hor" onclick="drawTable(3)">Horizontal bars</button>
+				<span id="hor-tip" class="tip">The arrangement of the<br />alive and the dead cells<br />in the form of horizontal bars<br />(every odd row – alive cells;<br />every even row – dead cells).<br />Keyboard shortcut: <span class='keyshort'>D</span></span>
+			</li>
+			<li>
+				<!-- dugme za prikazivanje vertikalnih pruga -->
+				<button id="vert" onclick="drawTable(4)">Vertical bars</button>
+				<span id="vert-tip" class="tip">The arrangement of the<br />alive and the dead cells<br />in the form of vertical bars<br />(every odd column – alive cells;<br />every even column – dead cells).<br />Keyboard shortcut: <span class='keyshort'>F</span></span>
+			</li>
+			<li>
+				<!-- dugme za prikazivanje dijagonalnih pruga -->
+				<button id="diag" onclick="drawTable(5)">Diagonal bars</button>
+				<span id="diag-tip" class="tip">The arrangement of the<br />alive and the dead cells<br />in the form of diagonal bars.<br />Keyboard shortcut: <span class='keyshort'>G</span></span>
+			</li>
+			<li>
+				<!-- dugme za prikazivanje šahovskog rasporeda -->
+				<button id="chess" onclick="drawTable(6)">Chess layout</button>
+				<span id="chess-tip" class="tip">The arrangement of the alive<br />and the dead cells in the<br />form of a chessboard fields.<br />Keyboard shortcut: <span class='keyshort'>H</span></span>
+			</li>
+			<li>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+			</li>
+			<li>
+				<!-- dugme za prikazivanje inverznog raporeda -->
+				<button id="inverse" onclick="inverse()">Inverse layout</button>
+				<span id="inverse-tip" class="tip">Replaces all the black (live) cells with<br />the white (dead) cells and vice versa;<br />after this, the simulation step counter<br />returns to zero, since hereby<br />the new simulation is started.<br />Keyboard shortcut: <span class='keyshort'>I</span></span>
+			</li>
+		</ul>
+	</div>
+
+	<!-- treći red kontrolne table -->
+	<div class="commands2">
+		<ul>
+			<li>
+				<!-- dugme za vraćanje simulacije unazad -->
+				<button id="reverse" onclick="reverse()">
+					<img src="../images/reverse-disabled.png" alt="reverse" width="auto" height=18 />
+				</button>
+				<span id="reverse-tip" class="tip">Starts the simulation backwards.<br />Keyboard shortcut: <span class='keyshort'>X</span></span>
+			</li>
+			<li>
+				<!-- dugme za prethodni korak simulacije -->
+				<button id="step-rev" onclick="stepRev()">
+					<img src="../images/step-rev-disabled.png" alt="previous frame" width="auto" height=18 />
+				</button>
+				<span id="step-rev-tip" class="tip">Goes back one<br />simulation step.<br />Keyboard shortcut: <span class='keyshort'>C</span></span>
+			</li>
+			<li>
+				<!-- dugme za jedan korak simulacije -->
+				<button id="step" onclick="oneStep()">
+					<img src="../images/step.png" alt="frame advance" width="auto" height=18 />
+				</button>
+				<span id="step-tip" class="tip">Executes one<br />simulation step.<br />Keyboard shortcut: <span class='keyshort'>V</span></span>
+			</li>
+			<li>
+				&nbsp;&nbsp;
+			</li>
+			<li>
+				<!-- dugme za startovanje/pauziranje/nastavljanje simulacije -->
+				<button id="start" onclick="run()"><img src="../images/play.png" alt="play/pause" width="auto" height=18 /></button>
+				<span id="start-tip" class="tip">Starts the simulation.<br />Keyboard shortcut: <span class='keyshort'>B</span></span>
+				<span id="pause-tip" class="tip">Pauses the simulation.<br />Keyboard shortcut: <span class='keyshort'>B</span></span>
+				<span id="cont-tip" class="tip">Continues the simulation.<br />Keyboard shortcut: <span class='keyshort'>B</span></span>
+			</li>
+			<li>
+				<!-- LED-dioda -->
+				<div id="led" class="led-off"></div>
+				<span id="led-tip" class="tip">Mode LED-indicator:<ul><li>off: "STOP" mode</li><li>on: "PLAY" mode</li><li>slow blinking: "PAUSE" mode</li><li>fast blinking: "REVERSE" mode</li></ul></span>
+			</li>
+			<li>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+			</li>
+			<li>
+				<!-- regulator brzine simulacije -->
+				<span id="slow">slow</span><input id="speed" type="range" min="1" max="9" step="1" onmousedown="setTimeout(speedMouseDown, 0)" onmouseup="speedMouseUp()"><span id="fast">fast</span>
+				<span id="speed-tip" class="tip">Simulation speed regulator:<ul><li>Leftmost position – minimal speed</li><li>Rightmost position – maximal speed</li></ul>Keyboard shortcuts:<br /><ul><li><span class='keyshort'>N</span> (reduces speed)</li><li><span class='keyshort'>M</span> (increase speed)</li></ul></span>
+			</li>
+			<li>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</li>
+			<li>
+				<!-- opcija da se promene prikazuju u boji -->
+				<label><input type="checkbox" id="changes" name="changes" onclick="displayNew()"><span id="changes-in-color">Status changes<br />are displayed in color</span></label>
+				<span id="changes-tip" class="tip">When unchecked, the cells are<br />displayed in two colors:<ul><li>black: alive</li><li>white: dead</li></ul>Checking this option adds two<br />more colors:<ul><li>blue: the cell has just revived</li><li>yellow: the cell has just died</li></ul>Keyboard shortcut: <span class='keyshort'>K</span></span>
+			</li>
+			<li>
+				<!-- izbor ponašanja ivica tabele -->
+				<span id="edge">
+					<span>Table edges behavior</span><br />
+					<label><input type="radio" name="edge" value=0 id="edge1" onclick="changeEdgeMode(0)" checked>mode 1</label>
+					<label><input type="radio" name="edge" value=1 id="edge2" onclick="changeEdgeMode(1)">mode 2</label>
+				<span>
+				<span id="edge-tip" class="tip">The way cells located on the edges<br />of the table behave:<ul><li>mode 1: the table edges act like<br />real, physical walls – there's no<br />anything behind them;</li><li>mode 2: behind the right edge<br />there's the left edge of the table,<br />behind the bottom edge there's<br />the top edge of the table and<br />so on. In other words, the table<br />can be observed as a surface of<br />the sphere, whereby it's right<br />edge is joined with the left edge,<br />likewise the bottom with the top<br />edge.</li></ul>Keyboard shortcut: <span class='keyshort'>L</span></span>
+			</li>
+	</div>
+</div>
+
+</body>
+
+</html>
