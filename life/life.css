@@ -51,7 +51,7 @@ h2 {
 
 	/* Position the tooltip */
 	position: absolute;
-	right: -123px;
+	right: -138px;
 	top: 26px;
 	z-index: 1;
 	outline: none;
@@ -81,13 +81,11 @@ h2 {
 .languages li {
 	display: inline;
 	margin-right: 5px;
-	cursor: pointer;
 }
 
 .languages li img.selected { /* izabrana zastavica odgovarajućeg jezika */
 	position: relative;
 	border: navy solid 2px;
-	cursor: default;
 	margin: -2px;
 }
 
@@ -158,13 +156,14 @@ td.alive:hover {
 }
 
 #counter {
+	display: inline;
 	float: left;
 	text-align: left;
 	width: 40%;
 	margin-top: 8px;
 }
 
-.counter {
+#counter span {
 	font-weight: bold;
 	color: blue;
 }
@@ -287,7 +286,8 @@ li .tip {
 
 .counter-random li .tip {
 	bottom: 28px;
-	left: -35px;
+	left: auto!important;
+	right: -18px;
 }
 
 .commands1 li .tip {
@@ -299,11 +299,13 @@ li .tip {
 }
 
 #inverse-tip {
-	left: -24px;
+	left: auto!important;
+	right: -56px;
 }
 
 #edge-tip {
-	left: -76px;
+	left: auto!important;
+	right: 8px;
 }
 
 li:hover .tip {
