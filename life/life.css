@@ -141,6 +141,10 @@ td.alive:hover:active {
 	background-color: black;
 }
 
+#table.rightclick td.dead:hover {
+	background-color: white;
+}
+
 .counter-random {
 	width: 95%;
 	margin-left: auto;
