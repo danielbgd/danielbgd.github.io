@@ -94,16 +94,12 @@ h2 {
 	height: auto;
 }
 
-table {
+#table {
 	border-collapse: collapse;
 	clear: both;
-	width: auto;
 	margin-left: auto;
 	margin-right: auto;
 	border: 2px solid #000;
-}
-
-#table {
 	cursor: url(images/pencil.cur), pointer;
 }
 
@@ -111,16 +107,10 @@ table {
 	cursor: url(images/eraser.cur), pointer;
 }
 
-tr, td {
-	border: 1px solid #ddd;
-}
-
 td {
-	width: 7px;
-}
-
-tr {
-	height: 10px
+	border: 1px solid #ddd;
+	margin: 0;
+	padding: 0;
 }
 
 td.dead {
@@ -145,6 +135,10 @@ td.dead:hover {
 
 td.alive:hover {
 	background-color: #555;
+}
+
+td.alive:hover:active {
+	background-color: black;
 }
 
 .counter-random {
@@ -200,7 +194,12 @@ td.alive:hover {
 	left: -5px;	
 }
 
-.counter-random ul, .commands1 ul, .commands2 ul {
+.commands3 {
+	margin-top: -8px;
+	margin-bottom: 0px;	
+}
+
+.counter-random ul, .commands1 ul, .commands2 ul, .commands3 ul {
 	list-style-type: none;
 	position: relative;
 	top: 0px;
@@ -208,15 +207,19 @@ td.alive:hover {
 	padding: 0px;
 }
 
-.counter-random li, .commands1 li, .commands2 li {
+.counter-random li, .commands1 li, .commands2 li, .commands3 li {
 	display: inline;
 	position: relative;
 	top: 0px;
 	bottom: 0px;
 }
 
-.counter-random ul ul, .commands1 ul ul, .commands2 ul ul {
+.counter-random ul ul, .commands1 ul ul, .commands2 ul ul, .commands3 ul ul {
 	padding-left: 25px;
+}
+
+.commands3 li {
+	margin-left: 8px;
 }
 
 button {
@@ -245,7 +248,7 @@ button {
 	margin: 0 4px;
 }
 
-#changes-in-color, #edge {
+#changes-in-color, #edge, .commands3 li {
 	font-size: 12px;
 }
 
@@ -255,6 +258,10 @@ button {
 
 .deact #density {
 	cursor: default;
+}
+
+.deact input {
+	color: grey;
 }
 
 li .tip {
@@ -368,6 +375,33 @@ button img {
 	background-size: 12px auto;
 }
 
+.led-on {
+	background: url(images/led.png) 0 -12px;
+	background-size: 12px auto;
+}
+
+input[type="number"]:focus {
+	background-color: #BFF;
+}
+
+#numberofrows, #numberofcolumns {
+	width: 45px;
+}
+
+#tablewidth {
+	width: 52px;
+}
+
+#cellwidth {
+	width: 38px;
+}
+
+.accept {
+	margin-left: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
 @media screen and (max-width: 620px) {
 	.languages {
 		position: relative;
@@ -377,7 +411,7 @@ button img {
 	}
 }
 
-@media screen and (max-width: 820px) {
+@media screen and (max-width: 828px) {
 	table, #help, .counter-random, .commands1, .commands2 {
 		display: none;
 	}
