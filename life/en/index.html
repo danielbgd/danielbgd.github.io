@@ -22,9 +22,6 @@
 
 <title>The Game of Life</title>
 
-<script>var imgFolder = "../images/"</script>
-<script src="../life.js"></script>
-
 <link href="../life.css" rel="stylesheet" type="text/css">
 
 <link rel="shortcut icon" href="../images/favicon.gif" type="image/x-icon" />
@@ -35,6 +32,9 @@
 </head>
 
 <body onload="init()" onmouseup="tableMouseUp(event)">
+
+<script>var imgFolder = "../images/"</script>
+<script src="../life.js"></script>
 
 <div class="container">
 	<h1>The Game of Life</h1>
@@ -51,11 +51,13 @@
 		<li><a href="javascript:alertClose('The entire table content will be erased. Do you want to continue?', '../');"><img id="srb" src="../images/srb.png" alt="Srpski jezik" title="Prebaci na srpski jezik" /></a></li>
 		<li><img id="eng" src="../images/eng.png" alt="English language" title="English language" class="selected" /></li>
 	</ul>
+</div>
 
 	<!-- prikaz tabele -->
 	<table id="table"></table>
 	<br />
 
+<div class="container">
 	<!-- prvi red kontrolne table -->
 	<div class="counter-random">
 
@@ -184,6 +186,43 @@
 					<label><input type="radio" name="edge" value=1 id="edge2" onclick="changeEdgeMode(1)">mode 2</label>
 				<span>
 				<span id="edge-tip" class="tip">The way cells located on the edges<br />of the table behave:<ul><li>mode 1: the table edges act like<br />real, physical walls – there's no<br />anything behind them;</li><li>mode 2: behind the right edge<br />there's the left edge of the table,<br />behind the bottom edge there's<br />the top edge of the table and<br />so on. In other words, the table<br />can be observed as a surface of<br />the sphere, whereby it's right<br />edge is joined with the left edge,<br />likewise the bottom with the top<br />edge.</li></ul>Keyboard shortcut: <span class='keyshort'>L</span></span>
+			</li>
+	</div>
+
+	<!-- četvrti red kontrolne table (komande za broj i veličinu ćelija u tabeli) -->
+	<div class="commands3">
+		<ul>
+			<strong>Table:</strong>&nbsp;&nbsp;&nbsp;&nbsp;
+			<li>
+				Number of rows:
+				<input id="numberofrows" type="number" name="numberofrows" value="58" min="1" max="999" onkeypress="setTimeout(verifyInput,0)">
+			</li>
+			<li>
+				Number of columns:
+				<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="999" onkeypress="setTimeout(verifyInput,0)">
+			</li>
+			<li>
+				<label onclick="document.getElementById('cellwidth').disabled = true; document.getElementById('tablewidth').disabled = false; document.getElementById('cellwidthinput').className = 'deact'; document.getElementById('tablewidthinput').className = ''; document.getElementById('tablewidth').focus();">
+					<input type="radio" name="choosewidth" checked>
+					<span id="tablewidthinput">
+						Whole table width: &#8776;
+						<input id="tablewidth" type="number" name="tablewidth" value="800" min="1" max="1920" onkeypress="setTimeout(verifyInput,0)">
+						px
+					</span>
+				</label>
+			</li>
+			<li>
+				<label onclick="document.getElementById('tablewidth').disabled = true;document.getElementById('cellwidth').disabled = false; document.getElementById('tablewidthinput').className = 'deact'; document.getElementById('cellwidthinput').className = ''; document.getElementById('cellwidth').focus();">
+					<input type="radio" name="choosewidth">
+					<span id="cellwidthinput" class="deact">
+						Cell width/height:
+						<input id="cellwidth" type="number" name="cellwidth" value="9" min="1" max="99" onkeypress="setTimeout(verifyInput,0)" disabled>
+						px
+					</span>
+				</label>
+			</li>
+			<li>
+				<button class="accept" onclick="clickTableDim('Ceo sadržaj tabele biće obrisan. Da li želite da nastavite?')">Accept</button>
 			</li>
 	</div>
 </div>
