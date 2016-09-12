@@ -195,11 +195,13 @@
 			<strong>Tabela:</strong>&nbsp;&nbsp;&nbsp;&nbsp;
 			<li>
 				Broj redova:
-				<input id="numberofrows" type="number" name="numberofrows" value="58" min="1" max="999" onkeypress="setTimeout(verifyInput,0)">
+				<input id="numberofrows" type="number" name="numberofrows" value="54" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+				<span class="tip"><strong>Upozorenje!</strong><br />Unošenje prevelikih vrednosti<br />može značajno usporiti simulaciju.</span>
 			</li>
 			<li>
 				Broj kolona:
-				<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="999" onkeypress="setTimeout(verifyInput,0)">
+				<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+				<span class="tip"><strong>Upozorenje!</strong><br />Unošenje prevelikih vrednosti<br />može značajno usporiti simulaciju.</span>
 			</li>
 			<li>
 				<label onclick="document.getElementById('cellwidth').disabled = true; document.getElementById('tablewidth').disabled = false; document.getElementById('cellwidthinput').className = 'deact'; document.getElementById('tablewidthinput').className = ''; document.getElementById('tablewidth').focus();">
@@ -210,6 +212,7 @@
 						px
 					</span>
 				</label>
+				<span class="tip">Nova širina tabele biće jednaka onom<br />celobrojnom umnošku broja kolona<br />koji je najpribližniji unetoj vrednosti.</span>
 			</li>
 			<li>
 				<label onclick="document.getElementById('tablewidth').disabled = true;document.getElementById('cellwidth').disabled = false; document.getElementById('tablewidthinput').className = 'deact'; document.getElementById('cellwidthinput').className = ''; document.getElementById('cellwidth').focus();">
@@ -220,6 +223,7 @@
 						px
 					</span>
 				</label>
+				<span class="tip">Pošto je ćelija kvadratnog<br />oblika, njena širina i visina<br />su međusobno jednake.</span>
 			</li>
 			<li>
 				<button class="accept" onclick="clickTableDim('Ceo sadržaj tabele biće obrisan. Da li želite da nastavite?')">Prihvati</button>
