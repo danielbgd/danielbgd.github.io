@@ -601,11 +601,11 @@ function isAnyAlive() {
 
 // provera da li je numerički unos dimenzija tabele ispravan
 function verifyInput() {
-	if (document.getElementById("numberofrows").value > 999) { // uneti unos broja redova tabele ne može biti veći od 999
-		document.getElementById("numberofrows").value = 999;
+	if (document.getElementById("numberofrows").value > 500) { // uneti unos broja redova tabele ne može biti veći od 500
+		document.getElementById("numberofrows").value = 500;
 	}
-	if (document.getElementById("numberofcolumns").value > 999) { // uneti unos broja kolona tabele ne može biti veći od 999
-		document.getElementById("numberofcolumns").value = 999;
+	if (document.getElementById("numberofcolumns").value > 500) { // uneti unos broja kolona tabele ne može biti veći od 500
+		document.getElementById("numberofcolumns").value = 500;
 	}
 	if (document.getElementById("tablewidth").value > 1920) { // uneti unos širine tabele ne može biti veći od 1920 (koliko iznosi rezolucija na najvećim monitorima)
 		document.getElementById("tablewidth").value = 1920;
