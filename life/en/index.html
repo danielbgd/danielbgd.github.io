@@ -195,21 +195,24 @@
 			<strong>Table:</strong>&nbsp;&nbsp;&nbsp;&nbsp;
 			<li>
 				Number of rows:
-				<input id="numberofrows" type="number" name="numberofrows" value="58" min="1" max="999" onkeypress="setTimeout(verifyInput,0)">
+				<input id="numberofrows" type="number" name="numberofrows" value="54" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+				<span class="tip"><strong>Warning!</strong><br />Entering too large values<br />may significantly slow down<br />the simulation.</span>
 			</li>
 			<li>
 				Number of columns:
-				<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="999" onkeypress="setTimeout(verifyInput,0)">
+				<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+				<span class="tip"><strong>Warning!</strong><br />Entering too large values<br />may significantly slow down<br />the simulation.</span>
 			</li>
 			<li>
 				<label onclick="document.getElementById('cellwidth').disabled = true; document.getElementById('tablewidth').disabled = false; document.getElementById('cellwidthinput').className = 'deact'; document.getElementById('tablewidthinput').className = ''; document.getElementById('tablewidth').focus();">
 					<input type="radio" name="choosewidth" checked>
 					<span id="tablewidthinput">
-						Whole table width: &#8776;
+						Table width: &#8776;
 						<input id="tablewidth" type="number" name="tablewidth" value="800" min="1" max="1920" onkeypress="setTimeout(verifyInput,0)">
 						px
 					</span>
 				</label>
+				<span class="tip">The new table width vill be<br />equal to the integer multiple of<br />the number of columns that is<br />the closest to the entered value.</span>
 			</li>
 			<li>
 				<label onclick="document.getElementById('tablewidth').disabled = true;document.getElementById('cellwidth').disabled = false; document.getElementById('tablewidthinput').className = 'deact'; document.getElementById('cellwidthinput').className = ''; document.getElementById('cellwidth').focus();">
@@ -220,6 +223,7 @@
 						px
 					</span>
 				</label>
+				<span class="tip">Since a cell is square-shaped,<br />its width and height are equal.</span>
 			</li>
 			<li>
 				<button class="accept" onclick="clickTableDim('Ceo sadržaj tabele biće obrisan. Da li želite da nastavite?')">Accept</button>
