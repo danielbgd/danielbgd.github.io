@@ -224,6 +224,7 @@ td.alive:hover:active {
 
 .commands3 li {
 	margin-left: 8px;
+	font-size: 11px!important;
 }
 
 button {
@@ -309,6 +310,10 @@ li .tip {
 	bottom: 28px;
 }
 
+.commands3 li .tip {
+	bottom: 20px;
+}
+
 #inverse-tip {
 	left: auto!important;
 	right: -56px;
@@ -389,15 +394,15 @@ input[type="number"]:focus {
 }
 
 #numberofrows, #numberofcolumns {
-	width: 45px;
+	width: 43px;
 }
 
 #tablewidth {
-	width: 52px;
+	width: 50px;
 }
 
 #cellwidth {
-	width: 38px;
+	width: 36px;
 }
 
 .accept {
