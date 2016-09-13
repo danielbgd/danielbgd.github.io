@@ -137,7 +137,7 @@ td.alive:hover {
 	background-color: #555;
 }
 
-td.alive:hover:active {
+body:active td.alive:hover {
 	background-color: black;
 }
 
