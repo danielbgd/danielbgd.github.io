@@ -10,17 +10,17 @@
 <meta name="author" content="">
 <meta name="resource-type" content="document" />
 <meta name="distribution" content="global" />
-<meta name="keywords" content="igra zivota" />
-<meta name="description" content="Igra života" />
+<meta name="keywords" content="konvejeva igra zivota conway game of life simulacija" />
+<meta name="description" content="Konvejeva „Igra života“" />
 <meta name="robots" content="index, follow" />
 <meta property="og:image" content="" />
-<meta property="og:title" content="Igra života" />
+<meta property="og:title" content="Konvejeva „Igra života“" />
 <meta property="og:url" content="" />
-<meta property="og:site_name" content="Igra života" />
+<meta property="og:site_name" content="Konvejeva „Igra života“" />
 <meta property="og:type" content="website" />
-<meta property="og:description" content="Igra života" />
+<meta property="og:description" content="Konvejeva „Igra života“" />
 
-<title>Igra života</title>
+<title>Konvejeva „Igra života“</title>
 
 <link href="life.css" rel="stylesheet" type="text/css">
 
@@ -37,13 +37,13 @@
 <script src="life.js"></script>
 
 <div class="container">
-	<h1>Igra života</h1>
+	<h1>Konvejeva „Igra života“</h1>
 
 	<h2>Nažalost, rezolucija Vašeg ekrana je suviše mala za ispravno prikazivanje ove simulacije.</h2>
 
 	<!-- help -->
 	<span id="help">?
-		<span id="help2"><p>Igra života je veoma popularna igra koja demonstrira kako je moguće iz početnog haosa dobiti uređene strukture, kada je ispunjeno nekoliko jednostavnih pravila.</p><p>Glavni objekt ove igre je tabela koja se sastoji od živih (crnih) i mrtvih (belih) ćelija, pri čemu je svaka ćelija okružena sa osam drugih (živih ili mrtvih) ćelija. Na samom početku, raspoređujemo žive i mrtve ćelije na željen, proizvoljan način. Neki od predefinisanih rasporeda mogu se postići upotrebom dostupnih dugmeta (Sve bele, Sve crne...), u kombinaciji s dodatnim aktiviranjem/deaktiviranjem ćelija levim/desnim klikom miša, čime je omogućeno ručno crtanje nekih objekata. Postoji, takođe, opcija generisanja random rasporeda (pomoću random klizača).</p><p>Nakon postavljanja tabele, simulacija se može izvršiti na dva načina – idući korak po korak pritiskanjem „one-step“ dugmeta za svaki novi korak simulacije, ili pritiskom na „start“ dugme čime se pokreće automatizovana simulacija.</p><p>Pravila po kojima se simulacija izvršava jesu sledeća:<ul><li>ako je ćelija okružena s manje od dve žive ćelije, ili je okružena s više od tri žive ćelije, u sledećem koraku ona je mrtva usled usamljenosti (u prvom slučaju), ili usled prenaseljenosti (u drugom slučaju);</li><li>ako je ćelija okružena s tačno dve žive ćelije, u sledećem koraku ne menja svoj status (živa ćelija ostaje živa, mrtva ćelija ostaje mrtva);</li><li>ako je ćelija okružena s tačno tri žive ćelije, u sledećem koraku ona je živa.</li></ul><p>Ili, sa stanovišta opstanka ćelije, ova pravila se mogu formulisati u nešto drugačijem obliku:</p><ul><li>ako je ćelija mrtva, u sledećem koraku ona oživljava ako i samo ako je okružena s tačno tri žive ćelije;</li><li>ako je ćelija živa, u sledećem koraku ona ostaje živa ako i samo ako je okružena s tačno dve ili s tačno tri žive ćelije.</li></ul></p><p>Prečice na tastaturi:</p><ul>Popunjavanje tabele predefinisanim sadržajem:<li><span class='keyshort'>1–9</span> – random raspored – 1 je za najmanju gustinu, 9 je za najveću gustinu;</li><li><span class='keyshort'>A</span> – sve bele ćelije;</li><li><span class='keyshort'>S</span> – sve crne ćelije;</li><li><span class='keyshort'>D</span> – raspored u vidu horizontalnih pruga;</li><li><span class='keyshort'>F</span> – raspored u vidu vertikalnih pruga;</li><li><span class='keyshort'>G</span> – raspored u vidu dijagonalnih pruga;</li><li><span class='keyshort'>H</span> – raspored u vidu šahovskih polja;</li><li><span class='keyshort'>I</span> – pravljenje inverznog rasporeda u odnosu na trenutni.</li></ul><ul>Komande:<li><span class='keyshort'>X</span> – pokretanje simulacije unazad;</li><li><span class='keyshort'>C</span> – jedan korak simulacije nazad;</li><li><span class='keyshort'>V</span> – jedan korak simulacije napred;</li><li><span class='keyshort'>B</span> – pokretanje/pauziranje simulacije;</li><li><span class='keyshort'>N</span> – usporavanje simulacije;</li><li><span class='keyshort'>M</span> – ubrzavanje simulacije;</li><li><span class='keyshort'>K</span> – promene statusa se prikazuju u boji;</li><li><span class='keyshort'>L</span> – ponašanje ivica tabele.</li></ul><p>Detaljan opis svake opcije može se videti prelaskom kursora miša preko dugmeta/regulatora/checkboxa za tu opciju.</p></span>
+		<span id="help2"><p>)„Igra života“ (The Game of Life), koju je 1970. godine osmislio britanski matematičar Džon Konvej (John Conway), demonstrira kako je moguće iz početnog haosa dobiti uređene strukture, kada je ispunjeno nekoliko jednostavnih pravila.</p><p>Glavni objekt ove igre je tabela koja se sastoji od živih (crnih) i mrtvih (belih) ćelija, pri čemu je svaka ćelija okružena sa osam drugih (živih ili mrtvih) ćelija. Na samom početku, raspoređujemo žive i mrtve ćelije na željen, proizvoljan način. Neki od predefinisanih rasporeda mogu se postići upotrebom dostupnih dugmeta (Sve bele, Sve crne...), u kombinaciji s dodatnim aktiviranjem/deaktiviranjem ćelija levim/desnim klikom miša, čime je omogućeno ručno crtanje nekih objekata. Postoji, takođe, opcija generisanja random rasporeda (pomoću random klizača).</p><p>Nakon postavljanja tabele, simulacija se može izvršiti na dva načina – idući korak po korak pritiskanjem „one-step“ dugmeta za svaki novi korak simulacije, ili pritiskom na „start“ dugme čime se pokreće automatizovana simulacija.</p><p>Pravila po kojima se simulacija izvršava jesu sledeća:<ul><li>ako je ćelija okružena s manje od dve žive ćelije, ili je okružena s više od tri žive ćelije, u sledećem koraku ona je mrtva usled usamljenosti (u prvom slučaju), ili usled prenaseljenosti (u drugom slučaju);</li><li>ako je ćelija okružena s tačno dve žive ćelije, u sledećem koraku ne menja svoj status (živa ćelija ostaje živa, mrtva ćelija ostaje mrtva);</li><li>ako je ćelija okružena s tačno tri žive ćelije, u sledećem koraku ona je živa.</li></ul><p>Ili, sa stanovišta opstanka ćelije, ova pravila se mogu formulisati u nešto drugačijem obliku:</p><ul><li>ako je ćelija mrtva, u sledećem koraku ona oživljava ako i samo ako je okružena s tačno tri žive ćelije;</li><li>ako je ćelija živa, u sledećem koraku ona ostaje živa ako i samo ako je okružena s tačno dve ili s tačno tri žive ćelije.</li></ul></p><p>Prečice na tastaturi:</p><ul>Popunjavanje tabele predefinisanim sadržajem:<li><span class='keyshort'>1–9</span> – random raspored – 1 je za najmanju gustinu, 9 je za najveću gustinu;</li><li><span class='keyshort'>A</span> – sve bele ćelije;</li><li><span class='keyshort'>S</span> – sve crne ćelije;</li><li><span class='keyshort'>D</span> – raspored u vidu horizontalnih pruga;</li><li><span class='keyshort'>F</span> – raspored u vidu vertikalnih pruga;</li><li><span class='keyshort'>G</span> – raspored u vidu dijagonalnih pruga;</li><li><span class='keyshort'>H</span> – raspored u vidu šahovskih polja;</li><li><span class='keyshort'>I</span> – pravljenje inverznog rasporeda u odnosu na trenutni.</li></ul><ul>Komande:<li><span class='keyshort'>X</span> – pokretanje simulacije unazad;</li><li><span class='keyshort'>C</span> – jedan korak simulacije nazad;</li><li><span class='keyshort'>V</span> – jedan korak simulacije napred;</li><li><span class='keyshort'>B</span> – pokretanje/pauziranje simulacije;</li><li><span class='keyshort'>N</span> – usporavanje simulacije;</li><li><span class='keyshort'>M</span> – ubrzavanje simulacije;</li><li><span class='keyshort'>K</span> – promene statusa se prikazuju u boji;</li><li><span class='keyshort'>L</span> – ponašanje ivica tabele.</li></ul><p>Detaljan opis svake opcije može se videti prelaskom kursora miša preko dugmeta/regulatora/checkboxa za tu opciju.</p></span>
 	</span>
 
 	<!-- izbor jezika prikaza -->
@@ -160,7 +160,7 @@
 			<li>
 				<!-- LED-dioda -->
 				<div id="led" class="led-off"></div>
-				<span id="led-tip" class="tip">Indikator režima rada:<ul><li>isključeno: režim „STOP“</li><li>uključeno: režim „PLAY“</li><li>sporo treperenje: režim „PAUSE“</li><li>brzo treperenje: režim „REVERSE“</li></ul></span>
+				<span id="led-tip" class="tip">LED-indikator režima rada:<ul><li>isključeno: režim „STOP“</li><li>uključeno: režim „PLAY“</li><li>sporo treperenje: režim „PAUSE“</li><li>brzo treperenje: režim „REVERSE“</li></ul></span>
 			</li>
 			<li>
 				&nbsp;&nbsp;&nbsp;&nbsp;
@@ -194,14 +194,18 @@
 		<ul>
 			<strong>Tabela:</strong>&nbsp;&nbsp;&nbsp;&nbsp;
 			<li>
-				Broj redova:
-				<input id="numberofrows" type="number" name="numberofrows" value="54" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
-				<span class="tip"><strong>Upozorenje!</strong><br />Unošenje prevelikih vrednosti<br />može značajno usporiti simulaciju.</span>
+				<label>
+					Broj redova:
+					<input id="numberofrows" type="number" name="numberofrows" value="54" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+					<span class="tip"><strong>Upozorenje!</strong><br />Unošenje prevelikih vrednosti<br />može značajno usporiti simulaciju.</span>
+				</label>
 			</li>
 			<li>
-				Broj kolona:
-				<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
-				<span class="tip"><strong>Upozorenje!</strong><br />Unošenje prevelikih vrednosti<br />može značajno usporiti simulaciju.</span>
+				<label>
+					Broj kolona:
+					<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+					<span class="tip"><strong>Upozorenje!</strong><br />Unošenje prevelikih vrednosti<br />može značajno usporiti simulaciju.</span>
+				</label>
 			</li>
 			<li>
 				<label onclick="document.getElementById('cellwidth').disabled = true; document.getElementById('tablewidth').disabled = false; document.getElementById('cellwidthinput').className = 'deact'; document.getElementById('tablewidthinput').className = ''; document.getElementById('tablewidth').focus();">
