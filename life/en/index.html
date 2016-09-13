@@ -10,17 +10,17 @@
 <meta name="author" content="">
 <meta name="resource-type" content="document" />
 <meta name="distribution" content="global" />
-<meta name="keywords" content="the game of life" />
-<meta name="description" content="The Game of Life" />
+<meta name="keywords" content="john conway game of life simulation" />
+<meta name="description" content="Conway's Game of Life" />
 <meta name="robots" content="index, follow" />
 <meta property="og:image" content="" />
-<meta property="og:title" content="The Game of Life" />
+<meta property="og:title" content="Conway's Game of Life" />
 <meta property="og:url" content="" />
-<meta property="og:site_name" content="The Game of Life" />
+<meta property="og:site_name" content="Conway's Game of Life" />
 <meta property="og:type" content="website" />
-<meta property="og:description" content="The Game of Life" />
+<meta property="og:description" content="Conway's Game of Life" />
 
-<title>The Game of Life</title>
+<title>Conway's Game of Life</title>
 
 <link href="../life.css" rel="stylesheet" type="text/css">
 
@@ -37,13 +37,13 @@
 <script src="../life.js"></script>
 
 <div class="container">
-	<h1>The Game of Life</h1>
+	<h1>Conway's Game of Life</h1>
 
 	<h2>Unfortunately, your screen resolution is too low to display this simulacion properly.</h2>
 
 	<!-- help -->
 	<span id="help">?
-		<span id="help2"><p>The Game of Life is a very popular game demonstrating how it's possible to obtain ordered structures from an initial chaos, when a few simple rules are obeyed.</p><p>The main object in this game is a table consisting of alive (black) and dead (white) cells, whereby each cell is surrounded by eight other (living or dead) cells. At the very beginning, we arrange the alive and dead cells in a desired, arbitrary way. Some of the predefined layouts can be obtained using the available buttons (All whites, All blacks...), combining with additional activating/deactivating some cells with the left/right mouse button, which makes it possible to manualy draw some objects. There is, also, an option of generating a random layout (with the random slider).</p><p>After setting up the table, the simulation can be run in two ways – by going step by step pressing the "+'"'+"one-step"+'"'+" button for every new simulation step, or by pressing the "+'"'+"start"+'"'+" button which runs the automated simulation.</p><p>The rules the simulation is based on are the following:<ul><li>if a cell is surrounded by less than two alive cells, or is surrounded by more than three alive cells, in the next step it's dead due to the loneliness (in the first case), or due to the overpopulation (in the second case);</li><li>if a cell is surrounded by exactly two alive cells, in the next step it doesn't change its status (the alive cell stays alive, the dead cell stays dead);</li><li>if a cell is surrounded by exactly three alive cells, in the next step it's alive.</li></ul><p>Or, from the standpoint of cell's survival, these rules can be formulated in a slightly different form:</p><ul><li>if a cell is dead, in the next step it becomes alive if and only if it's surrounded by exactly three alive cells;</li><li>if a cell is alive, in the next step it stays alive if and only if it's surrounded by exactly two or by exactly three alive cells.</li></ul></p><p>Keyboard shortcuts:</p><ul>Populating the table with predefined content:<li><span class='keyshort'>1–9</span> – random layout – 1 is for the minimal density, 9 is for the maximal density;</li><li><span class='keyshort'>A</span> – all white cells;</li><li><span class='keyshort'>S</span> – all black cells;</li><li><span class='keyshort'>D</span> – a form of horizontal bars;</li><li><span class='keyshort'>F</span> – a form of vertical bars;</li><li><span class='keyshort'>G</span> – a form of diagonal bars;</li><li><span class='keyshort'>H</span> – a chess-shaped form;</li><li><span class='keyshort'>I</span> – making the inverse of the current layout.</li></ul><ul>Commands:<li><span class='keyshort'>X</span> – running the simulation backwards;</li><li><span class='keyshort'>C</span> – one simulation step back;</li><li><span class='keyshort'>V</span> – one simulation step advance;</li><li><span class='keyshort'>B</span> – running/pausing the simulation;</li><li><span class='keyshort'>N</span> – slowing down the simulation running;</li><li><span class='keyshort'>M</span> – accelerating the simulation running;</li><li><span class='keyshort'>K</span> – status changes are displayed in color;</li><li><span class='keyshort'>L</span> – table edges behavior.</li></ul><p>A detailed description of a particular option can be seen by hovering a button/regulator/checkbox for that option.</p></span>
+		<span id="help2"><p>The Game of Life, devised in 1970. by British mathematician John Conway, demonstrates how it's possible to obtain ordered structures from an initial chaos, when a few simple rules are obeyed.</p><p>The main object in this game is a table consisting of alive (black) and dead (white) cells, whereby each cell is surrounded by eight other (living or dead) cells. At the very beginning, we arrange the alive and dead cells in a desired, arbitrary way. Some of the predefined layouts can be obtained using the available buttons (All whites, All blacks...), combining with additional activating/deactivating some cells with the left/right mouse button, which makes it possible to manualy draw some objects. There is, also, an option of generating a random layout (with the random slider).</p><p>After setting up the table, the simulation can be run in two ways – by going step by step pressing the "+'"'+"one-step"+'"'+" button for every new simulation step, or by pressing the "+'"'+"start"+'"'+" button which runs the automated simulation.</p><p>The rules the simulation is based on are the following:<ul><li>if a cell is surrounded by less than two alive cells, or is surrounded by more than three alive cells, in the next step it's dead due to the loneliness (in the first case), or due to the overpopulation (in the second case);</li><li>if a cell is surrounded by exactly two alive cells, in the next step it doesn't change its status (the alive cell stays alive, the dead cell stays dead);</li><li>if a cell is surrounded by exactly three alive cells, in the next step it's alive.</li></ul><p>Or, from the standpoint of cell's survival, these rules can be formulated in a slightly different form:</p><ul><li>if a cell is dead, in the next step it becomes alive if and only if it's surrounded by exactly three alive cells;</li><li>if a cell is alive, in the next step it stays alive if and only if it's surrounded by exactly two or by exactly three alive cells.</li></ul></p><p>Keyboard shortcuts:</p><ul>Populating the table with predefined content:<li><span class='keyshort'>1–9</span> – random layout – 1 is for the minimal density, 9 is for the maximal density;</li><li><span class='keyshort'>A</span> – all white cells;</li><li><span class='keyshort'>S</span> – all black cells;</li><li><span class='keyshort'>D</span> – a form of horizontal bars;</li><li><span class='keyshort'>F</span> – a form of vertical bars;</li><li><span class='keyshort'>G</span> – a form of diagonal bars;</li><li><span class='keyshort'>H</span> – a chess-shaped form;</li><li><span class='keyshort'>I</span> – making the inverse of the current layout.</li></ul><ul>Commands:<li><span class='keyshort'>X</span> – running the simulation backwards;</li><li><span class='keyshort'>C</span> – one simulation step back;</li><li><span class='keyshort'>V</span> – one simulation step advance;</li><li><span class='keyshort'>B</span> – running/pausing the simulation;</li><li><span class='keyshort'>N</span> – slowing down the simulation running;</li><li><span class='keyshort'>M</span> – accelerating the simulation running;</li><li><span class='keyshort'>K</span> – status changes are displayed in color;</li><li><span class='keyshort'>L</span> – table edges behavior.</li></ul><p>A detailed description of a particular option can be seen by hovering a button/regulator/checkbox for that option.</p></span>
 	</span>
 
 	<!-- izbor jezika prikaza -->
@@ -194,14 +194,18 @@
 		<ul>
 			<strong>Table:</strong>&nbsp;&nbsp;&nbsp;&nbsp;
 			<li>
-				Number of rows:
-				<input id="numberofrows" type="number" name="numberofrows" value="54" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
-				<span class="tip"><strong>Warning!</strong><br />Entering too large values<br />may significantly slow down<br />the simulation.</span>
+				<label>
+					Number of rows:
+					<input id="numberofrows" type="number" name="numberofrows" value="54" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+					<span class="tip"><strong>Warning!</strong><br />Entering too large values<br />may significantly slow down<br />the simulation.</span>
+				</label>
 			</li>
 			<li>
-				Number of columns:
-				<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
-				<span class="tip"><strong>Warning!</strong><br />Entering too large values<br />may significantly slow down<br />the simulation.</span>
+				<label>
+					Number of columns:
+					<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+					<span class="tip"><strong>Warning!</strong><br />Entering too large values<br />may significantly slow down<br />the simulation.</span>
+				</label>
 			</li>
 			<li>
 				<label onclick="document.getElementById('cellwidth').disabled = true; document.getElementById('tablewidth').disabled = false; document.getElementById('cellwidthinput').className = 'deact'; document.getElementById('tablewidthinput').className = ''; document.getElementById('tablewidth').focus();">
@@ -226,7 +230,7 @@
 				<span class="tip">Since a cell is square-shaped,<br />its width and height are equal.</span>
 			</li>
 			<li>
-				<button class="accept" onclick="clickTableDim('Ceo sadržaj tabele biće obrisan. Da li želite da nastavite?')">Accept</button>
+				<button class="accept" onclick="clickTableDim('The entire table content will be erased. Do you want to continue?')">Accept</button>
 			</li>
 	</div>
 </div>
