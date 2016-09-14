@@ -1,7 +1,7 @@
 var m; // broj redova tabele (uzima se iz inicijalne vrednosti odgovarajućeg input polja)
 var n; // broj kolona tabele (uzima se iz inicijalne vrednosti odgovarajućeg input polja)
 var p; // broj ćelija tabele (p=m*n, broj ćelija tabele je proizvod broja redova i broja kolona)
-var cellDim; // dimenzija ćelije (širina = visina, budući da je ćelija kvadratnog oblika), dobija se ili iz polja za unos dimenzije ćelije, ili izračunavanjem na osnovu unete širine i broja kola tabele
+var cellDim = 9; // inicijalna dimenzija ćelije (širina = visina, budući da je ćelija kvadratnog oblika), dobija se ili iz polja za unos dimenzije ćelije, ili izračunavanjem na osnovu unete širine i broja kolona tabele
 var counter; // brojač koraka simulacije
 var ledFlag; // indikator stanja LED-diode za vreme njenog blinkanja u režimu „PAUSE“ (0 – off; 1 – on)
 var ledLoop = 0; // varijabla timing-eventa treperenja LED-diode u režimima „PAUSE“ i „REVERSE“
@@ -22,13 +22,13 @@ var tablemousedown = false; // ako je levi taster miša stisnut dok je kursor un
 var tablemouserightdown = false; // ako je desni taster miša stisnut dok je kursor unutar tabele, postavlja se na TRUE; ako je desni taster miša otpušten bilo unutar, bilo van tabele, postavlja se na FALSE; koristi se radi crtanja po tabeli pomoću right-dragginga
 var densityValue = 5; // varijabla koja sadrži vrednost regulatora gustine random rasporeda
 var speedValue = 5; // varijabla koja sadrži vrednost regulatora brzine simulacije
+var dimChosen = false; // flag koji pokazuje da li je korisnik najmanje jednom izabrao dimenzije tabele; koristi se da bi, u slučaju da korisnik nije prethodno naveo dimenzije tabele, prilikom resizovanja browsera iste bile prilagođene novoj veličini browserskog prozora
 
 // inicijalizacija
 function init() {
-	createTableDim(); // očitavanje dimenzija tabele (broj redova, broj kolona, širina cele tabele ili dimenzija ćelije) iz inicijalnog unosa
 	document.getElementById("density").value = densityValue; // postavljanje regulatora gustine random rasporeda na inicijalnu vrednost (sadržanu u varijabli „densityValue“)
 	document.getElementById("speed").value = speedValue; // postavljanje regulatora brzine simulacije na inicijalnu vrednost (sadržanu u varijabli „speedValue“)
-	drawTable(1); // formiranje tabele
+	newDimOnWinResize(); // automatska promena dimenzija tabele, prilagođena novim dimenzijama browserskog prozora (promena broja redova i broja kolona)
 }
 
 // crtanje nove tabele (prazne ili s nekim drugim predefinisanim sadržajem, u zavisnosti od argumenta „content“)
@@ -54,21 +54,21 @@ function drawTable(content) {
 	}
 	var cellID = 0; // redni broj trenutne ćelije
 	if (content == 0) { // u slučaju da je izabran random raspored...
-		thresholdRandom = 0.08 * document.getElementById("density").value; // ... generiše se prag odlučivanja da li će ćelija biti mrtva ili živa – što je izabrana gustina živih ćelija veća, i prag za žive ćelije će biti veći
+		thresholdRandom = 0.08 * document.getElementById("density").value; // ...generiše se prag odlučivanja da li će ćelija biti mrtva ili živa – što je izabrana gustina živih ćelija veća, i prag za žive ćelije će biti veći
 	}
 	for (i = 1; i <= m; i++) { // petlja po redovima tabele
 		cellHTML += "<tr>"; // pri započinjanju svakog reda tabele na string „cellHTML“ dodajemo otvarajući HTML-tag za red tabele
 		for (j = 1; j <= n; j++) { // petlja po kolonama tabele
 			cellID++; // redni broj trenutne ćelije se uvećava prilikom svakog prolaska kroz unutrašnju petlju
 			cellHTML += "<td id='" + cellID + "' onmousedown='tableMouseDown(event," + cellID + ")' onmouseenter='tableMouseEnter(" + cellID + ")' ondragstart='return false' oncontextmenu='return false'"; // započinjemo HTML-kôd za ćeliju tabele; onmousedown u slučaju pritiska na levi taster miša postavljaće flag „tablemousedown“ na TRUE i postavljaće status ćelije na „živo“, dok će u slučaju pritiska na desni taster miša postavljati flag „tablemouserightdown“ na TRUE i postavljati status ćelije na „mrtvo“; onmouseenter, u slučaju da je flag „tablemousedown“ ili flag „tablemouserightdown“ postavljen na TRUE i da se kursorom miša prešlo iz jedne ćelije u drugu, postavljaće odgovarajući status te ćelije u koju se prešlo, u zavisnosti od toga koji je flag TRUE (tj. koje je dugme miša pritisnuto); ondragstart='return false' sprečavaće pravi mouse-dragging, jer bi on zbrljao stvari; oncontextmenu='return false' sprečavaće pojavu context-menija prilikom desnog klika dok je kursor unutar tabele
-			var life = false; // privremena varijabla u kojoj čuvamo status koji treba da ima trenutna ćelija (ćelija živa – true; ćelija mrtva – false)
+			var life = false; // privremena varijabla u kojoj čuvamo status koji treba da ima trenutna ćelija (ćelija živa – TRUE; ćelija mrtva – FALSE)
 			switch (content) {
 				case 0: // žive i mrtve ćelije treba da budu random raspoređene
 					if (Math.random() < thresholdRandom) { // ukoliko je random generisan broj (između 0 i 1) manji od praga za žive ćelije, ćelija će biti živa; u suprotnom, ostaće mrtva
 						life = true;
 					}
 					break;
-				// case 1 (sve bele ćelije) možemo preskočiti, jer varijabla life tada za svaku ćeliju zadržava već postojeću vrednost false
+				// case 1 (sve bele ćelije) možemo preskočiti, jer varijabla life tada za svaku ćeliju zadržava već postojeću vrednost FALSE
 				case 2: // sve ćelije tabele treba da budu crne (žive)
 					life = true;
 					break;
@@ -550,36 +550,40 @@ function changeEdgeMode(newEdge) {
 	edge = newEdge;
 }
 
-// ukoliko su zadate nove dimenzije tabele (promena broja redova, promena broja kolona, promena širine cele tabele ili promena dimenzije ćelije)
-function clickTableDim(alertCloseMessage) {
-	if (isAnyAlive()) { // ukoliko na tabeli postoji makar jedna „živa“ ćelija
-		answer = confirm (alertCloseMessage); // iskače alert box s pitanjem da li da se obriše cela tabela...
-		if (answer) {
-			createTableDim(); // ...i, ukoliko je odgovor potvrdan, klik na promenu dimenzija tabele se prihvata
+// ukoliko je kliknuto na promenu dimenzija tabele (promena broja redova, promena broja kolona, promena širine cele tabele ili promena dimenzije ćelije)
+function clickTableDim() {
+	if (mode != 1 && mode != 3) { // u režimima „PLAY“ i „REVERSE“ treba da bude onemogućena promena dimazija tabele
+		dimChosen = true; // postavljanje flaga koji pokazuje da je korisnik najmanje jednom izabrao dimenzije tabele
+		if (isAnyAlive()) { // ukoliko na tabeli postoji makar jedna „živa“ ćelija...
+			answer = confirm (alertMsg); // ...iskače alert box s pitanjem da li da se obriše cela tabela...
+			if (answer) {
+				createTableDim(); // ...i, ukoliko je odgovor potvrdan, klik na promenu dimenzija tabele se prihvata
+			}
+		} else { // ukoliko na tabeli nije pronađena nijedna „živa“ ćelija...
+			createTableDim(); // klik na promenu dimenzija tabele se automatski prihvata
 		}
-	} else { // ukoliko na tabeli nije pronađena nijedna „živa“ ćelija...
-		createTableDim(); // klik na promenu dimenzija tabele se automatski prihvata
 	}
 }
 
 // promena dimenzije tabele (promena broja redova, promena broja kolona, promena širine cele tabele ili promena dimenzije ćelije)
 function createTableDim() {
+	document.getElementById("counter").style.display = "none"; // uklanjanje prikaza broja koraka, budući da je s prethodnom simulacijom završeno
 	m = +document.getElementById("numberofrows").value; // broj redova tabele (uzima se iz vrednosti odgovarajućeg input polja)
 	n = +document.getElementById("numberofcolumns").value; // broj kolona tabele (uzima se iz vrednosti odgovarajućeg input polja)
 	p = m * n; // broj ćelija tabele je proizvod broja redova i broja kolona
-	document.getElementById("counter").style.display = "none"; // uklanjanje prikaza broja koraka, budući da je s prethodnom simulacijom završeno
 	if (document.getElementById("tablewidth").disabled) { // ukoliko nije uneta širina tabele, već dimenzija ćelije...
 		cellDim = +document.getElementById("cellwidth").value; // varijabla „cellDim“ koja sadrži vrednost dimenzije ćelije, poprima vrednost unete dimenzije ćelije
 	} else { // u suprotnom, ukoliko je uneta širina tabele...
-		cellDim = Math.round(+document.getElementById("tablewidth").value / n) - 1; // ... dimenzija ćelije (širina = visina, budući da je ćelija kvadratnog oblika) izračunava se tako da širina tabele bude što približnija zadatoj (širina tabele dobija se tako što širina ćelije zajedno s jednim zidom ćelije ima cellDim+1 piksela, pa se to pomnoži brojem kolona n i doda 3, budući da leva i desna ivica tabele imaju po 2 piksela)
+		cellDim = Math.floor((+document.getElementById("tablewidth").value - 23) / n) - 1; // ...dimenzija ćelije (širina = visina, budući da je ćelija kvadratnog oblika); prilikom računanja dimenzije ćelije u zavisnosti od širine tabele i broja kolona uzima se u obzir da je širina tabele jednaka proizvodu broja kolona i dimenzije ćelije zajedno s jednim njenim zidom (cellDim+1), na šta se još doda 3 budući da na okvir tabele ide 4 piksela, a ne 1 piksel; takođe, levo i desno od tabele se ostavlja margina od 10px
+		cellDim = (cellDim < 1) ? 1 : cellDim; // minimalna dimenzija ćelije mora biti 1, pa ukoliko je dobijena dimenzija ćelije manja od 1, dodeljuje joj se vrednost 1
 	}
-	drawTable(1); // crta se prazna tabela s novim dimenzijama	
+	drawTable(1); // crta se prazna tabela s novim dimenzijama
 }
 
-function alertClose(alertCloseMessage, link) { // upozorenje i zahtev za potvrdu prilikom klika na link za promenu jezika, u slučaju da je na tabeli bar jedna ćelija označena kao „živa“; „alertCloseMessage“ je tekst upozorenja koji se prikazuje u alert boxu, a „link“ je adresa na koju se ide u slučaju potvrde
+function alertChangeLang(link) { // upozorenje i zahtev za potvrdu prilikom klika na link za promenu jezika, u slučaju da je na tabeli bar jedna ćelija označena kao „živa“; „link“ je adresa na koju se ide u slučaju potvrde
 	// provera da li se na tabeli nalazi bar jedna „živa“ ćelija
 	if (isAnyAlive()) {
-		answer = confirm (alertCloseMessage); // iskače alert box s pitanjem da li da se obriše cela tabela...
+		answer = confirm (alertMsg); // iskače alert box s pitanjem da li da se obriše cela tabela...
 		if (answer) {
 			window.location = link; // ukoliko je odgovor potvrdan, klik na link za promenu jezika se prihvata
 		}
@@ -624,6 +628,21 @@ function verifyInput() {
 	}
 	if (document.getElementById("cellwidth").value < 1) { // uneti unos dimenzije ćelije ne može biti manji od 1
 		document.getElementById("cellwidth").value = 1;
+	}
+}
+
+function newDimOnWinResize() { // automatska promena dimenzija tabele, prilagođena novim dimenzijama browserskog prozora (promena broja redova i broja kolona)
+	if (!dimChosen && !isAnyAlive()) { // ne vrši se automatski resize tabele u slučaju da je korisnik uneo dimenzije tabele, ili u slučaju da na tabeli već postoje „živa“ polja
+		document.getElementById("tablewidth").value = window.innerWidth; // postavljanje inicijalne vrednosti polja za unos širine tabele na vrednost širine browserskog prozora
+		document.getElementById("cellwidth").value = cellDim; // postavljanje inicijalne vrednosti polja za unos dimenzije ćelije
+		m = Math.floor((window.innerHeight - document.getElementsByClassName("container")[0].offsetHeight - document.getElementsByClassName("container")[1].offsetHeight - 51) / (cellDim + 1)); // prilikom računanja inicijalnog broja redova u zavisnosti od visine raspoloživog prostora i dimenzije ćelije uzima se u obzir da je visina tabele jednaka proizvodu broja redova i dimenzije ćelije zajedno s jednim njenim zidom (cellDim+1), na šta se još doda 3 budući da na okvir tabele ide 4 piksela, a ne 1 piksel
+		n = Math.floor((document.getElementById("tablewidth").value - 23) / (cellDim + 1)); // prilikom računanja inicijalnog broja kolona u zavisnosti od širine browserskog prozora i dimenzije ćelije uzima se u obzir da je širina tabele jednaka proizvodu broja kolona i dimenzije ćelije zajedno s jednim njenim zidom (cellDim+1), na šta se još doda 3 budući da na okvir tabele ide 4 piksela, a ne 1 piksel
+		m = (m < 10) ? 10 : m; // minimalan početni broj redova tabele mora biti 10, pa ukoliko je dobijena vrednost manja od 10, dodeljuje joj se vrednost 10
+		n = (n < 10) ? 10 : n; // minimalan početni broj kolona tabele mora biti 10, pa ukoliko je dobijena vrednost manja od 10, dodeljuje joj se vrednost 10
+		p = m * n; // broj ćelija tabele je proizvod broja redova i broja kolona
+		document.getElementById("numberofrows").value = m; // postavljanje vrednosti polja za unos broja redova tabele
+		document.getElementById("numberofcolumns").value = n; // postavljanje vrednosti polja za unos broja kolona tabele
+		drawTable(1);
 	}
 }
 
@@ -709,25 +728,33 @@ function key(event) {
 
 			// radne komande
 			case 120: // taster „X“ za simulaciju unazad
-				if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „PLAY“ i „REVERSE“, kao i pre izvršenja prvog koraka simulacije, opcija za simulaciju unazad je onemogućena
+				if (mode != 1 && mode != 3 && counter > 0) { // osim u režimu „REVERSE“, isto tako i u režimu „PLAY“ (mode=1), kao i pre izvršenja prvog koraka simulacije, opcija za simulaciju unazad je onemogućena
 					reverse();
 					document.getElementById("reverse").focus(); // stavljanje fokusa na odgovarajuće dugme
 				}
 				break;
 			case 99: // taster „C“ za vraćanje jednog koraka simulacije
-				if (mode != 1 && mode != 3 && counter > 0) { // u bilo kom režimu osim „PLAY“ i „REVERSE“, kao i pre izvršenja prvog koraka simulacije, opcija za jedan korak simulacije je onemogućena
+				if (mode != 1 && mode != 3 && counter > 0) { // osim u režimu „REVERSE“, isto tako i u režimu „PLAY“ (mode=1), kao i pre izvršenja prvog koraka simulacije, opcija za vraćanje jednog koraka simulacije je onemogućena
 					stepRev();
 					document.getElementById("step-rev").focus(); // stavljanje fokusa na odgovarajuće dugme
 				}
 				break;
 			case 118: // taster „V“ za izvršavanje jednog koraka simulacije
-				if (mode != 1 || mode != 3) { // u režimima „PLAY“ (mode=1) i „REVERSE“ (mode=3) opcija za jedan korak simulacije je onemogućena
+				if (mode != 1) { // osim u režimu „REVERSE“, opcija za jedan korak simulacije je onemogućena i u režimu „PLAY“ (mode=1)
 					oneStep();
 					document.getElementById("step").focus(); // stavljanje fokusa na odgovarajuće dugme
 				}
 				break;
+			case 13: // taster „ENTER“ za unošenje novih dimenzija tabele
+				if (mode != 1 && (document.activeElement.id == "numberofrows" || document.activeElement.id == "numberofcolumns" || document.activeElement.id == "tablewidth" || document.activeElement.id == "cellwidth")) { // osim u režimu „REVERSE“, opcija za unošenje novih dimenzija tabele je onemogućena i u režimu „PLAY“ (mode=1); omogućena je jedino ako je fokus na nekom od polja za unos dimenzija tabele
+					dimChosen = true; // flag koji pokazuje da li je korisnik najmanje jednom izabrao dimenzije tabele postavlja se na TRUE
+					clickTableDim(); // promena dimenzija tabele (promena broja redova, promena broja kolona, promena širine cele tabele ili promena dimenzije ćelije)
+					document.getElementById("accept").focus(); // stavljanje fokusa na odgovarajuće dugme
+				}
+				break;
 		}
 	}
+	
 	switch (x) {
 		case 98: // taster „B“ za pokretanje/pauziranje simulacije
 			run();
