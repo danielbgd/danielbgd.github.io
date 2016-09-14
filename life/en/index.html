@@ -31,9 +31,10 @@
 
 </head>
 
-<body onload="init()" onmouseup="tableMouseUp(event)">
+<body onload="init()" onmouseup="tableMouseUp(event)" onresize="newDimOnWinResize()">
 
-<script>var imgFolder = "../images/"</script>
+<script>var imgFolder = "../images/";
+var alertMsg = "The entire table content will be erased. Do you want to continue?"</script>
 <script src="../life.js"></script>
 
 <div class="container">
@@ -48,7 +49,7 @@
 
 	<!-- izbor jezika prikaza -->
 	<ul class="languages">
-		<li><a href="javascript:alertClose('The entire table content will be erased. Do you want to continue?', '../');"><img id="srb" src="../images/srb.png" alt="Srpski jezik" title="Prebaci na srpski jezik" /></a></li>
+		<li><a href="javascript:alertChangeLang('../');"><img id="srb" src="../images/srb.png" alt="Srpski jezik" title="Prebaci na srpski jezik" /></a></li>
 		<li><img id="eng" src="../images/eng.png" alt="English language" title="English language" class="selected" /></li>
 	</ul>
 </div>
@@ -212,7 +213,7 @@
 					<input type="radio" name="choosewidth" checked>
 					<span id="tablewidthinput">
 						Table width: &#8776;
-						<input id="tablewidth" type="number" name="tablewidth" value="800" min="1" max="1920" onkeypress="setTimeout(verifyInput,0)">
+						<input id="tablewidth" type="number" name="tablewidth" min="1" max="1920" onkeypress="setTimeout(verifyInput,0)">
 						px
 					</span>
 				</label>
@@ -223,14 +224,14 @@
 					<input type="radio" name="choosewidth">
 					<span id="cellwidthinput" class="deact">
 						Cell width/height:
-						<input id="cellwidth" type="number" name="cellwidth" value="9" min="1" max="99" onkeypress="setTimeout(verifyInput,0)" disabled>
+						<input id="cellwidth" type="number" name="cellwidth" min="1" max="99" onkeypress="setTimeout(verifyInput,0)" disabled>
 						px
 					</span>
 				</label>
 				<span class="tip">Since a cell is square-shaped,<br />its width and height are equal.</span>
 			</li>
 			<li>
-				<button class="accept" onclick="clickTableDim('The entire table content will be erased. Do you want to continue?')">Accept</button>
+				<button id="accept" class="accept" onclick="clickTableDim()">Accept</button>
 			</li>
 	</div>
 </div>
