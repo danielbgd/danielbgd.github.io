@@ -26,8 +26,8 @@ var dimChosen = false; // flag koji pokazuje da li je korisnik najmanje jednom i
 
 // inicijalizacija
 function init() {
-	document.getElementById("density").value = densityValue; // postavljanje regulatora gustine random rasporeda na inicijalnu vrednost (sadržanu u varijabli „densityValue“)
-	document.getElementById("speed").value = speedValue; // postavljanje regulatora brzine simulacije na inicijalnu vrednost (sadržanu u varijabli „speedValue“)
+	document.getElementById("density").value = densityValue.toString(); // postavljanje regulatora gustine random rasporeda na inicijalnu vrednost (sadržanu u varijabli „densityValue“)
+	document.getElementById("speed").value = speedValue.toString(); // postavljanje regulatora brzine simulacije na inicijalnu vrednost (sadržanu u varijabli „speedValue“)
 	newDimOnWinResize(); // automatska promena dimenzija tabele, prilagođena novim dimenzijama browserskog prozora (promena broja redova i broja kolona)
 }
 
@@ -54,7 +54,7 @@ function drawTable(content) {
 	}
 	var cellID = 0; // redni broj trenutne ćelije
 	if (content == 0) { // u slučaju da je izabran random raspored...
-		thresholdRandom = 0.08 * document.getElementById("density").value; // ...generiše se prag odlučivanja da li će ćelija biti mrtva ili živa – što je izabrana gustina živih ćelija veća, i prag za žive ćelije će biti veći
+		thresholdRandom = 0.08 * Number(document.getElementById("density").value); // ...generiše se prag odlučivanja da li će ćelija biti mrtva ili živa – što je izabrana gustina živih ćelija veća, i prag za žive ćelije će biti veći
 	}
 	for (i = 1; i <= m; i++) { // petlja po redovima tabele
 		cellHTML += "<tr>"; // pri započinjanju svakog reda tabele na string „cellHTML“ dodajemo otvarajući HTML-tag za red tabele
@@ -147,15 +147,15 @@ function tableMouseEnter(x) {
 
 // ako je levi taster miša pritisnut dok je kursor na regulatoru gustine random rasporeda
 function densityMouseDown() {
-	densityValue = document.getElementById("density").value; // vrednost regulatora gustine random rasporeda kopira se u varijablu „densityValue“
+	densityValue = Number(document.getElementById("density").value); // vrednost regulatora gustine random rasporeda kopira se u varijablu „densityValue“
 	drawTable(0); // crtanje tabele (argument 0 znači da se crta random raspored)
 	dnsLoop = setInterval(densityLoop, 100); // startovanje petlje u kojoj se proverava da li je došlo do pomeranja regulatora gustine random rasporeda
 }
 
 // petlja u kojoj se proverava da li je došlo do pomeranja regulatora gustine random rasporeda
 function densityLoop() {
-	if (densityValue != document.getElementById("density").value) { // ako položaj regulatora gustine random rasporeda više nije jednak vrednosti koja je sačuvana u varijabli „densityValue“, znači da je došlo do pomeranja regulatora
-		densityValue = document.getElementById("density").value; // u tom slučaju, nova vrednost koju daje regulator gustine random rasporeda kopira se u varijablu „densityValue“...
+	if (densityValue != Number(document.getElementById("density").value)) { // ako položaj regulatora gustine random rasporeda više nije jednak vrednosti koja je sačuvana u varijabli „densityValue“, znači da je došlo do pomeranja regulatora
+		densityValue = Number(document.getElementById("density").value); // u tom slučaju, nova vrednost koju daje regulator gustine random rasporeda kopira se u varijablu „densityValue“...
 		drawTable(0); // ...i crta se nova tabela (argument 0 znači da se crta random raspored)
 	}
 }
@@ -167,8 +167,8 @@ function densityMouseUp() {
 
 // ako je levi taster miša pritisnut dok je kursor na regulatoru brzine simulacije
 function speedMouseDown() {
-	if (speedValue != document.getElementById("speed").value) {
-		speedValue = document.getElementById("speed").value; // vrednost regulatora brzine simulacije kopira se u varijablu „speedValue“
+	if (speedValue != Number(document.getElementById("speed").value)) {
+		speedValue = Number(document.getElementById("speed").value); // vrednost regulatora brzine simulacije kopira se u varijablu „speedValue“
 		changeSpeed();
 	}
 	spdLoop = setInterval(speedLoop, 100); // startovanje petlje u kojoj se proverava da li je došlo do pomeranja regulatora brzine simulacije
@@ -176,8 +176,8 @@ function speedMouseDown() {
 
 // petlja u kojoj se proverava da li je došlo do pomeranja regulatora brzine simulacije
 function speedLoop() {
-	if (speedValue != document.getElementById("speed").value) { // ako položaj regulatora brzine simulacije više nije jednak vrednosti koja je sačuvana u varijabli „speedValue“, znači da je došlo do pomeranja regulatora
-		speedValue = document.getElementById("speed").value; // u tom slučaju, nova vrednost koju daje regulator brzine simulacije kopira se u varijablu „speedValue“...
+	if (speedValue != Number(document.getElementById("speed").value)) { // ako položaj regulatora brzine simulacije više nije jednak vrednosti koja je sačuvana u varijabli „speedValue“, znači da je došlo do pomeranja regulatora
+		speedValue = Number(document.getElementById("speed").value); // u tom slučaju, nova vrednost koju daje regulator brzine simulacije kopira se u varijablu „speedValue“...
 		changeSpeed(); // i brzina simulacije se postavlja na novopodešenu vrednost
 	}
 }
@@ -396,6 +396,7 @@ function reverse() {
 		document.getElementById("edge").className = "deact"; // prikazivanje fonta opcije „edge“ sivom (neaktivnom) bojom
 		document.getElementById("edge1").disabled = true;
 		document.getElementById("edge2").disabled = true;
+		document.getElementById("accept").disabled = true;
 
 		clearInterval(ledLoop); // zaustavlja se sporo treperenje LED-diode iz režima „PAUSE“...
 		ledLoop = 0; // ...i varijabla timing-eventa treperenja se postavlja na nulu
@@ -407,7 +408,7 @@ function reverse() {
 		document.getElementById("start-tip").style.display = 'none'; // help tip se...
 		document.getElementById("pause-tip").style.display = 'inline'; // ...postavlja na...
 		document.getElementById("cont-tip").style.display = 'none'; // ...„pauziranje simulacije“
-		a = document.getElementById("speed").value; // podešavanje brzine na osnovu položaja klizača brzine
+		a = Number(document.getElementById("speed").value); // podešavanje brzine na osnovu položaja klizača brzine
 		runLoop = setInterval(stepRev, 1361 - 150 * a); // ponavljanje radne petlje
 	}
 }
@@ -432,7 +433,7 @@ function afterReverse() {
 
 // podešavanje brzine na osnovu položaja klizača brzine i ponavljanje radne petlje
 function setSpeed() {
-	a = document.getElementById("speed").value; // podešavanje brzine na osnovu položaja klizača brzine
+	a = Number(document.getElementById("speed").value); // podešavanje brzine na osnovu položaja klizača brzine
 	b = 1361 - 150 * a; // najmanjoj brzini (a=1) odgovara najveći period (b=1211), dok najvećoj brzini (a=9) odgovara najmanji period (b=11)
 	if (mode == 1) {
 		runLoop = setInterval(step, b); // ponavljanje radne petlje (za režim „PLAY“)
@@ -452,6 +453,7 @@ function run() {
 		document.getElementById("cont-tip").style.display = 'inline'; // ...„nastavljanje simulacije“
 		document.getElementById("step").disabled = false; // ponovo se aktivira dugme „FRAME ADVANCE“ (koje je bilo deaktivirano tokom režima „PLAY“)
 		document.getElementById("step").getElementsByTagName("img")[0].src = stepButton; // ponovo se aktivira i slika njegovog simbola na tasteru
+		document.getElementById("accept").disabled = false; // ponovo se aktivira dugme „Accept“ za prihvatanje dimenzija tabele (koje je bilo deaktivirano tokom režima „PLAY“)
 		if (counter > 0) { // ukoliko nismo na nultom koraku simulacije...
 			reverseAct(); // ...aktivacija dugmeta za vraćanje simulacije unazad
 			stepRevAct(); // takođe, aktivacija dugmeta za prethodni korak simulacije
@@ -481,6 +483,7 @@ function run() {
 		document.getElementById("led").className = "led-on"; // LED se uključuje
 		document.getElementById("step").disabled = true; // za vreme režima „PLAY“, dugme „FRAME ADVANCE“ je deaktivirano
 		document.getElementById("step").getElementsByTagName("img")[0].src = stepButtonDisabled; // deaktivira se i slika njegovog simbola na tasteru
+		document.getElementById("accept").disabled = true; // za vreme režima „PLAY“, dugme „Accept“ za prihvatanje dimenzija tabele je deaktivirano
 		reverseDeact(); // deaktivacija dugmeta za vraćanje simulacije unazad
 		stepRevDeact(); // deaktivacija dugmeta za prethodni korak simulacije
 		setSpeed(); // podešavanje brzine na osnovu položaja klizača brzine i ponavljanje radne petlje
@@ -552,7 +555,7 @@ function changeEdgeMode(newEdge) {
 
 // ukoliko je kliknuto na promenu dimenzija tabele (promena broja redova, promena broja kolona, promena širine cele tabele ili promena dimenzije ćelije)
 function clickTableDim() {
-	if (mode != 1 && mode != 3) { // u režimima „PLAY“ i „REVERSE“ treba da bude onemogućena promena dimazija tabele
+	if (mode != 1 && mode != 3) { // u režimima „PLAY“ i „REVERSE“ treba da bude onemogućena promena dimenzija tabele
 		dimChosen = true; // postavljanje flaga koji pokazuje da je korisnik najmanje jednom izabrao dimenzije tabele
 		if (isAnyAlive()) { // ukoliko na tabeli postoji makar jedna „živa“ ćelija...
 			answer = confirm (alertMsg); // ...iskače alert box s pitanjem da li da se obriše cela tabela...
@@ -568,13 +571,13 @@ function clickTableDim() {
 // promena dimenzije tabele (promena broja redova, promena broja kolona, promena širine cele tabele ili promena dimenzije ćelije)
 function createTableDim() {
 	document.getElementById("counter").style.display = "none"; // uklanjanje prikaza broja koraka, budući da je s prethodnom simulacijom završeno
-	m = +document.getElementById("numberofrows").value; // broj redova tabele (uzima se iz vrednosti odgovarajućeg input polja)
-	n = +document.getElementById("numberofcolumns").value; // broj kolona tabele (uzima se iz vrednosti odgovarajućeg input polja)
+	m = Number(document.getElementById("numberofrows").value); // broj redova tabele (uzima se iz vrednosti odgovarajućeg input polja)
+	n = Number(document.getElementById("numberofcolumns").value); // broj kolona tabele (uzima se iz vrednosti odgovarajućeg input polja)
 	p = m * n; // broj ćelija tabele je proizvod broja redova i broja kolona
 	if (document.getElementById("tablewidth").disabled) { // ukoliko nije uneta širina tabele, već dimenzija ćelije...
-		cellDim = +document.getElementById("cellwidth").value; // varijabla „cellDim“ koja sadrži vrednost dimenzije ćelije, poprima vrednost unete dimenzije ćelije
+		cellDim = Number(document.getElementById("cellwidth").value); // varijabla „cellDim“ koja sadrži vrednost dimenzije ćelije, poprima vrednost unete dimenzije ćelije
 	} else { // u suprotnom, ukoliko je uneta širina tabele...
-		cellDim = Math.floor((+document.getElementById("tablewidth").value - 23) / n) - 1; // ...dimenzija ćelije (širina = visina, budući da je ćelija kvadratnog oblika); prilikom računanja dimenzije ćelije u zavisnosti od širine tabele i broja kolona uzima se u obzir da je širina tabele jednaka proizvodu broja kolona i dimenzije ćelije zajedno s jednim njenim zidom (cellDim+1), na šta se još doda 3 budući da na okvir tabele ide 4 piksela, a ne 1 piksel; takođe, levo i desno od tabele se ostavlja margina od 10px
+		cellDim = Math.floor((Number(document.getElementById("tablewidth").value) - 23) / n) - 1; // ...dimenzija ćelije (širina = visina, budući da je ćelija kvadratnog oblika); prilikom računanja dimenzije ćelije u zavisnosti od širine tabele i broja kolona uzima se u obzir da je širina tabele jednaka proizvodu broja kolona i dimenzije ćelije zajedno s jednim njenim zidom (cellDim+1), na šta se još doda 3 budući da na okvir tabele ide 4 piksela, a ne 1 piksel; takođe, levo i desno od tabele se ostavlja margina od 10px
 		cellDim = (cellDim < 1) ? 1 : cellDim; // minimalna dimenzija ćelije mora biti 1, pa ukoliko je dobijena dimenzija ćelije manja od 1, dodeljuje joj se vrednost 1
 	}
 	drawTable(1); // crta se prazna tabela s novim dimenzijama
@@ -605,43 +608,43 @@ function isAnyAlive() {
 
 // provera da li je numerički unos dimenzija tabele ispravan
 function verifyInput() {
-	if (document.getElementById("numberofrows").value > 500) { // uneti unos broja redova tabele ne može biti veći od 500
-		document.getElementById("numberofrows").value = 500;
+	if (Number(document.getElementById("numberofrows").value) > 500) { // uneti unos broja redova tabele ne može biti veći od 500
+		document.getElementById("numberofrows").value = '500';
 	}
-	if (document.getElementById("numberofcolumns").value > 500) { // uneti unos broja kolona tabele ne može biti veći od 500
-		document.getElementById("numberofcolumns").value = 500;
+	if (Number(document.getElementById("numberofcolumns").value) > 500) { // uneti unos broja kolona tabele ne može biti veći od 500
+		document.getElementById("numberofcolumns").value = '500';
 	}
-	if (document.getElementById("tablewidth").value > 1920) { // uneti unos širine tabele ne može biti veći od 1920 (koliko iznosi rezolucija na najvećim monitorima)
-		document.getElementById("tablewidth").value = 1920;
+	if (Number(document.getElementById("tablewidth").value) > 1920) { // uneti unos širine tabele ne može biti veći od 1920 (koliko iznosi rezolucija na najvećim monitorima)
+		document.getElementById("tablewidth").value = '1920';
 	}
-	if (document.getElementById("cellwidth").value > 99) { // uneti unos dimenzije ćelije ne može biti veći od 99
-		document.getElementById("cellwidth").value = 99;
+	if (Number(document.getElementById("cellwidth").value) > 99) { // uneti unos dimenzije ćelije ne može biti veći od 99
+		document.getElementById("cellwidth").value = '99';
 	}
-	if (document.getElementById("numberofrows").value < 1) { // uneti unos broja redova tabele ne može biti manji od 1
-		document.getElementById("numberofrows").value = 1;
+	if (Number(document.getElementById("numberofrows").value) < 1) { // uneti unos broja redova tabele ne može biti manji od 1
+		document.getElementById("numberofrows").value = '1';
 	}
-	if (document.getElementById("numberofcolumns").value < 1) { // uneti unos broja redova tabele ne može biti manji od 1
-		document.getElementById("numberofcolumns").value = 1;
+	if (Number(document.getElementById("numberofcolumns").value) < 1) { // uneti unos broja redova tabele ne može biti manji od 1
+		document.getElementById("numberofcolumns").value = '1';
 	}
-	if (document.getElementById("tablewidth").value < 1) { // uneti unos širine tabele ne može biti manji od 1
-		document.getElementById("tablewidth").value = 1;
+	if (Number(document.getElementById("tablewidth").value) < 1) { // uneti unos širine tabele ne može biti manji od 1
+		document.getElementById("tablewidth").value = '1';
 	}
-	if (document.getElementById("cellwidth").value < 1) { // uneti unos dimenzije ćelije ne može biti manji od 1
-		document.getElementById("cellwidth").value = 1;
+	if (Number(document.getElementById("cellwidth").value) < 1) { // uneti unos dimenzije ćelije ne može biti manji od 1
+		document.getElementById("cellwidth").value = '1';
 	}
 }
 
 function newDimOnWinResize() { // automatska promena dimenzija tabele, prilagođena novim dimenzijama browserskog prozora (promena broja redova i broja kolona)
 	if (!dimChosen && !isAnyAlive()) { // ne vrši se automatski resize tabele u slučaju da je korisnik uneo dimenzije tabele, ili u slučaju da na tabeli već postoje „živa“ polja
-		document.getElementById("tablewidth").value = window.innerWidth; // postavljanje inicijalne vrednosti polja za unos širine tabele na vrednost širine browserskog prozora
-		document.getElementById("cellwidth").value = cellDim; // postavljanje inicijalne vrednosti polja za unos dimenzije ćelije
+		document.getElementById("tablewidth").value = Math.min(window.innerWidth, 900).toString(); // postavljanje inicijalne vrednosti polja za unos širine tabele na vrednost širine browserskog prozora, ali najviše na vrednost 900 piksela
+		document.getElementById("cellwidth").value = cellDim.toString(); // postavljanje inicijalne vrednosti polja za unos dimenzije ćelije
 		m = Math.floor((window.innerHeight - document.getElementsByClassName("container")[0].offsetHeight - document.getElementsByClassName("container")[1].offsetHeight - 51) / (cellDim + 1)); // prilikom računanja inicijalnog broja redova u zavisnosti od visine raspoloživog prostora i dimenzije ćelije uzima se u obzir da je visina tabele jednaka proizvodu broja redova i dimenzije ćelije zajedno s jednim njenim zidom (cellDim+1), na šta se još doda 3 budući da na okvir tabele ide 4 piksela, a ne 1 piksel
-		n = Math.floor((document.getElementById("tablewidth").value - 23) / (cellDim + 1)); // prilikom računanja inicijalnog broja kolona u zavisnosti od širine browserskog prozora i dimenzije ćelije uzima se u obzir da je širina tabele jednaka proizvodu broja kolona i dimenzije ćelije zajedno s jednim njenim zidom (cellDim+1), na šta se još doda 3 budući da na okvir tabele ide 4 piksela, a ne 1 piksel
+		n = Math.floor((Number(document.getElementById("tablewidth").value) - 23) / (cellDim + 1)); // prilikom računanja inicijalnog broja kolona u zavisnosti od širine browserskog prozora i dimenzije ćelije uzima se u obzir da je širina tabele jednaka proizvodu broja kolona i dimenzije ćelije zajedno s jednim njenim zidom (cellDim+1), na šta se još doda 3 budući da na okvir tabele ide 4 piksela, a ne 1 piksel
 		m = (m < 10) ? 10 : m; // minimalan početni broj redova tabele mora biti 10, pa ukoliko je dobijena vrednost manja od 10, dodeljuje joj se vrednost 10
 		n = (n < 10) ? 10 : n; // minimalan početni broj kolona tabele mora biti 10, pa ukoliko je dobijena vrednost manja od 10, dodeljuje joj se vrednost 10
 		p = m * n; // broj ćelija tabele je proizvod broja redova i broja kolona
-		document.getElementById("numberofrows").value = m; // postavljanje vrednosti polja za unos broja redova tabele
-		document.getElementById("numberofcolumns").value = n; // postavljanje vrednosti polja za unos broja kolona tabele
+		document.getElementById("numberofrows").value = m.toString(); // postavljanje vrednosti polja za unos broja redova tabele
+		document.getElementById("numberofcolumns").value = n.toString(); // postavljanje vrednosti polja za unos broja kolona tabele
 		drawTable(1);
 	}
 }
@@ -656,7 +659,7 @@ function key(event) {
 	if (x >= 49 && x <= 57 && mode != 3 && !(document.activeElement.type == "number")) { // opcija je neaktivna u režimu „REVERSE“; takođe, prečice na tastaturi treba onemogućiti dok je fokus na poljima za numerički unos (budući da su ovde u pitanju numerički tasteri)
 		document.getElementById("density").focus(); // stavljanje fokusa na regulator gustine random rasporeda
 		densityValue = x - 48; // za tastere 1–9 vrednost njihovog koda je za 48 veća od njihove vrednosti – prema tome, od koda tastera treba oduzeti 48 (npr. kôd za taster 3 je 51, oduzmemo 48 i dobijemo 3)
-		document.getElementById("density").value = densityValue; // regulator se namešta na onu poziciju koja odgovara pritisnutom tasteru 1–9
+		document.getElementById("density").value = densityValue.toString(); // regulator se namešta na onu poziciju koja odgovara pritisnutom tasteru 1–9
 		drawTable(0); // crtanje tabele (argument 0 znači da se crta random raspored)
 	}
 
@@ -664,17 +667,17 @@ function key(event) {
 	if (x == 110 || x == 109) {
 		document.getElementById("speed").focus(); // stavljanje fokusa na regulator brzine simulacije
 		if (x == 110) { // taster „N“ za usporavanje simulacije
-			var speed = document.getElementById("speed").value;
+			var speed = Number(document.getElementById("speed").value);
 			if (speed > 1) { // Ako klizač regulatora brzine nije na krajnjoj levoj poziciji...
 				speed--;
-				document.getElementById("speed").value = speed; // ...pomera se za jednu poziciju nalevo
+				document.getElementById("speed").value = speed.toString(); // ...pomera se za jednu poziciju nalevo
 				changeSpeed(); // brzina simulacije se smanjuje
 			}
 		} else { // taster „M“ za ubrzavanje simulacije
-			var speed = document.getElementById("speed").value;
+			var speed = Number(document.getElementById("speed").value);
 			if (speed < 9) { // Ako klizač regulatora brzine nije na krajnjoj desnoj poziciji...
 				speed++;
-				document.getElementById("speed").value = speed; // ...pomera se za jednu poziciju nadesno
+				document.getElementById("speed").value = speed.toString(); // ...pomera se za jednu poziciju nadesno
 				changeSpeed(); // brzina simulacije se povećava
 			}
 		}
