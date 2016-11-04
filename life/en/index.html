@@ -22,7 +22,7 @@
 
 <title>Conway's Game of Life</title>
 
-<link href="../life.css" rel="stylesheet" type="text/css">
+<link href="../life.css" rel="stylesheet" type="text/css" />
 
 <link rel="shortcut icon" href="../images/favicon.gif" type="image/x-icon" />
 
@@ -73,7 +73,7 @@ var alertMsg = "The entire table content will be erased. Do you want to continue
 				</li>
 				<li>
 					<!-- regulator gustine inicijalnog random rasporeda -->
-					<span id="rand-thin">thin</span><input id="density" type="range" min="1" max="9" step="1" onmousedown="setTimeout(densityMouseDown, 0)" onmouseup="densityMouseUp()"><span id="rand-thick">thick</span>
+					<span id="rand-thin">thin</span><input id="density" type="range" min="1" max="9" step="1" onmousedown="setTimeout(densityMouseDown, 0)" onmouseup="densityMouseUp()" /><span id="rand-thick">thick</span>
 					<span id="random-tip" class="tip">Regulator for the black (alive)<br />cells density in the initial step.<ul><li>Leftmost position – minimal density;</li><li>Rightmost position – maximal density;</li></ul>Keyboard shortcuts: <span class='keyshort'>1–9</span><ul><li>key 1 – minimal density</li><li>key 9 – maximal density</li></ul></span>
 				</li>
 			</ul>
@@ -168,7 +168,7 @@ var alertMsg = "The entire table content will be erased. Do you want to continue
 			</li>
 			<li>
 				<!-- regulator brzine simulacije -->
-				<span id="slow">slow</span><input id="speed" type="range" min="1" max="9" step="1" onmousedown="setTimeout(speedMouseDown, 0)" onmouseup="speedMouseUp()"><span id="fast">fast</span>
+				<span id="slow">slow</span><input id="speed" type="range" min="1" max="9" step="1" onmousedown="setTimeout(speedMouseDown, 0)" onmouseup="speedMouseUp()" /><span id="fast">fast</span>
 				<span id="speed-tip" class="tip">Simulation speed regulator:<ul><li>Leftmost position – minimal speed</li><li>Rightmost position – maximal speed</li></ul>Keyboard shortcuts:<br /><ul><li><span class='keyshort'>N</span> (reduces speed)</li><li><span class='keyshort'>M</span> (increase speed)</li></ul></span>
 			</li>
 			<li>
@@ -176,18 +176,19 @@ var alertMsg = "The entire table content will be erased. Do you want to continue
 			</li>
 			<li>
 				<!-- opcija da se promene prikazuju u boji -->
-				<label><input type="checkbox" id="changes" name="changes" onclick="displayNew()"><span id="changes-in-color">Status changes<br />are displayed in color</span></label>
+				<label><input type="checkbox" id="changes" name="changes" onclick="displayNew()" /><span id="changes-in-color">Status changes<br />are displayed in color</span></label>
 				<span id="changes-tip" class="tip">When unchecked, the cells are<br />displayed in two colors:<ul><li>black: alive</li><li>white: dead</li></ul>Checking this option adds two<br />more colors:<ul><li>blue: the cell has just revived</li><li>yellow: the cell has just died</li></ul>Keyboard shortcut: <span class='keyshort'>K</span></span>
 			</li>
 			<li>
 				<!-- izbor ponašanja ivica tabele -->
 				<span id="edge">
 					<span>Table edges behavior</span><br />
-					<label><input type="radio" name="edge" value=0 id="edge1" onclick="changeEdgeMode(0)" checked>mode 1</label>
-					<label><input type="radio" name="edge" value=1 id="edge2" onclick="changeEdgeMode(1)">mode 2</label>
-				<span>
+					<label><input type="radio" name="edge" value=0 id="edge1" onclick="changeEdgeMode(0)" checked />mode 1</label>
+					<label><input type="radio" name="edge" value=1 id="edge2" onclick="changeEdgeMode(1)" />mode 2</label>
+				</span>
 				<span id="edge-tip" class="tip">The way cells located on the edges<br />of the table behave:<ul><li>mode 1: the table edges act like<br />real, physical walls – there's no<br />anything behind them;</li><li>mode 2: behind the right edge<br />there's the left edge of the table,<br />behind the bottom edge there's<br />the top edge of the table and<br />so on. In other words, the table<br />can be observed as a surface of<br />the sphere, whereby it's right<br />edge is joined with the left edge,<br />likewise the bottom with the top<br />edge.</li></ul>Keyboard shortcut: <span class='keyshort'>L</span></span>
 			</li>
+		</ul>
 	</div>
 
 	<!-- četvrti red kontrolne table (komande za broj i veličinu ćelija u tabeli) -->
@@ -197,23 +198,23 @@ var alertMsg = "The entire table content will be erased. Do you want to continue
 			<li>
 				<label>
 					Number of rows:
-					<input id="numberofrows" type="number" name="numberofrows" value="54" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+					<input id="numberofrows" type="number" name="numberofrows" value="54" min="1" max="500" onkeypress="setTimeout(verifyInput,0)" />
 					<span class="tip"><strong>Warning!</strong><br />Entering too large values<br />may significantly slow down<br />the simulation.</span>
 				</label>
 			</li>
 			<li>
 				<label>
 					Number of columns:
-					<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+					<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="500" onkeypress="setTimeout(verifyInput,0)" />
 					<span class="tip"><strong>Warning!</strong><br />Entering too large values<br />may significantly slow down<br />the simulation.</span>
 				</label>
 			</li>
 			<li>
 				<label onclick="document.getElementById('cellwidth').disabled = true; document.getElementById('tablewidth').disabled = false; document.getElementById('cellwidthinput').className = 'deact'; document.getElementById('tablewidthinput').className = ''; document.getElementById('tablewidth').focus();">
-					<input type="radio" name="choosewidth" checked>
+					<input type="radio" name="choosewidth" checked />
 					<span id="tablewidthinput">
 						Table width: &#8776;
-						<input id="tablewidth" type="number" name="tablewidth" min="1" max="1920" onkeypress="setTimeout(verifyInput,0)">
+						<input id="tablewidth" type="number" name="tablewidth" min="1" max="1920" onkeypress="setTimeout(verifyInput,0)" />
 						px
 					</span>
 				</label>
@@ -221,10 +222,10 @@ var alertMsg = "The entire table content will be erased. Do you want to continue
 			</li>
 			<li>
 				<label onclick="document.getElementById('tablewidth').disabled = true;document.getElementById('cellwidth').disabled = false; document.getElementById('tablewidthinput').className = 'deact'; document.getElementById('cellwidthinput').className = ''; document.getElementById('cellwidth').focus();">
-					<input type="radio" name="choosewidth">
+					<input type="radio" name="choosewidth" />
 					<span id="cellwidthinput" class="deact">
 						Cell width/height:
-						<input id="cellwidth" type="number" name="cellwidth" min="1" max="99" onkeypress="setTimeout(verifyInput,0)" disabled>
+						<input id="cellwidth" type="number" name="cellwidth" min="1" max="99" onkeypress="setTimeout(verifyInput,0)" disabled />
 						px
 					</span>
 				</label>
@@ -233,6 +234,7 @@ var alertMsg = "The entire table content will be erased. Do you want to continue
 			<li>
 				<button id="accept" class="accept" onclick="clickTableDim()">Accept</button>
 			</li>
+		</ul>
 	</div>
 </div>
 
