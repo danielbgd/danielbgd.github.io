@@ -22,7 +22,7 @@
 
 <title>Konvejeva „Igra života“</title>
 
-<link href="life.css" rel="stylesheet" type="text/css">
+<link href="life.css" rel="stylesheet" type="text/css" />
 
 <link rel="shortcut icon" href="images/favicon.gif" type="image/x-icon" />
 
@@ -73,7 +73,7 @@ var alertMsg = "Ceo sadržaj tabele biće obrisan. Da li želite da nastavite?"<
 				</li>
 				<li>
 					<!-- regulator gustine inicijalnog random rasporeda -->
-					<span id="rand-thin">retko</span><input id="density" type="range" min="1" max="9" step="1" onmousedown="setTimeout(densityMouseDown, 0)" onmouseup="densityMouseUp()"><span id="rand-thick">gusto</span>
+					<span id="rand-thin">retko</span><input id="density" type="range" min="1" max="9" step="1" onmousedown="setTimeout(densityMouseDown, 0)" onmouseup="densityMouseUp()" /><span id="rand-thick">gusto</span>
 					<span id="random-tip" class="tip">Regulator gustine crnih (živih) ćelija<br />u početnom koraku.<ul><li>Krajnji levi položaj – najmanja gustina;</li><li>Krajnji desni položaj – najveća gustina;</li></ul>Prečice na tastaturi: <span class='keyshort'>1–9</span><ul><li>taster 1 – najmanja gustina</li><li>taster 9 – najveća gustina</li></ul></span>
 				</li>
 			</ul>
@@ -168,7 +168,7 @@ var alertMsg = "Ceo sadržaj tabele biće obrisan. Da li želite da nastavite?"<
 			</li>
 			<li>
 				<!-- regulator brzine simulacije -->
-				<span id="slow">sporo</span><input id="speed" type="range" min="1" max="9" step="1" onmousedown="setTimeout(speedMouseDown, 0)" onmouseup="speedMouseUp()"><span id="fast">brzo</span>
+				<span id="slow">sporo</span><input id="speed" type="range" min="1" max="9" step="1" onmousedown="setTimeout(speedMouseDown, 0)" onmouseup="speedMouseUp()" /><span id="fast">brzo</span>
 				<span id="speed-tip" class="tip">Regulator brzine simulacije:<ul><li>Krajnji levi položaj – najmanja brzina</li><li>Krajnji desni položaj – najveća brzina</li></ul>Prečice na tastaturi:<br /><ul><li><span class='keyshort'>N</span> (smanjivanje brzine)</li><li><span class='keyshort'>M</span> (povećavanje brzine)</li></ul></span>
 			</li>
 			<li>
@@ -176,18 +176,19 @@ var alertMsg = "Ceo sadržaj tabele biće obrisan. Da li želite da nastavite?"<
 			</li>
 			<li>
 				<!-- opcija da se promene prikazuju u boji -->
-				<label><input type="checkbox" id="changes" name="changes" onclick="displayNew()"><span id="changes-in-color">Promene statusa se<br />prikazuju u boji</span></label>
+				<label><input type="checkbox" id="changes" name="changes" onclick="displayNew()" /><span id="changes-in-color">Promene statusa se<br />prikazuju u boji</span></label>
 				<span id="changes-tip" class="tip">Kada je ova opcija isključena,<br />ćelije se prikazuju u dve boje:<ul><li>crna: živa</li><li>bela: mrtva</li></ul>Uključenjem ove opcije dodaju se<br />dve nove boje:<ul><li>plava: ćelija je upravo oživela</li><li>žuta: ćelija je upravo umrla</li></ul>Prečica na tastaturi: <span class='keyshort'>K</span></span>
 			</li>
 			<li>
 				<!-- izbor ponašanja ivica tabele -->
 				<span id="edge">
 					<span>Ponašanje ivica tabele</span><br />
-					<label><input type="radio" name="edge" value=0 id="edge1" onclick="changeEdgeMode(0)" checked>mod 1</label>
-					<label><input type="radio" name="edge" value=1 id="edge2" onclick="changeEdgeMode(1)">mod 2</label>
-				<span>
+					<label><input type="radio" name="edge" value=0 id="edge1" onclick="changeEdgeMode(0)" checked />mod 1</label>
+					<label><input type="radio" name="edge" value=1 id="edge2" onclick="changeEdgeMode(1)" />mod 2</label>
+				</span>
 				<span id="edge-tip" class="tip">Način na koji se ponašaju ćelije<br />locirane na ivicama tabele:<ul><li>mod 1: ivice tabele se ponašaju<br />kao pravi, fizički zidovi – ne postoji<br />ništa iza njih;</li><li>mod 2: iza desne ivice nalazi se<br />leva ivica tabele, iza donje ivice<br />nalazi se gornja ivica tabele itd.<br />Drugim rečima, tabela se može<br />posmatrati kao površina sfere,<br />pri čemu je njena desna ivica<br />spojena s desnom ivicom, isto<br />tako donja s gornjom ivicom.</li></ul>Prečica na tastaturi: <span class='keyshort'>L</span></span>
 			</li>
+		</ul>
 	</div>
 
 	<!-- četvrti red kontrolne table (komande za broj i veličinu ćelija u tabeli) -->
@@ -197,23 +198,23 @@ var alertMsg = "Ceo sadržaj tabele biće obrisan. Da li želite da nastavite?"<
 			<li>
 				<label>
 					Broj redova:
-					<input id="numberofrows" type="number" name="numberofrows" value="54" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+					<input id="numberofrows" type="number" name="numberofrows" value="54" min="1" max="500" onkeypress="setTimeout(verifyInput,0)" />
 					<span class="tip"><strong>Upozorenje!</strong><br />Unošenje prevelikih vrednosti<br />može značajno usporiti simulaciju.</span>
 				</label>
 			</li>
 			<li>
 				<label>
 					Broj kolona:
-					<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="500" onkeypress="setTimeout(verifyInput,0)">
+					<input id="numberofcolumns" type="number" name="numberofcolumns" value="80" min="1" max="500" onkeypress="setTimeout(verifyInput,0)" />
 					<span class="tip"><strong>Upozorenje!</strong><br />Unošenje prevelikih vrednosti<br />može značajno usporiti simulaciju.</span>
 				</label>
 			</li>
 			<li>
 				<label onclick="document.getElementById('cellwidth').disabled = true; document.getElementById('tablewidth').disabled = false; document.getElementById('cellwidthinput').className = 'deact'; document.getElementById('tablewidthinput').className = ''; document.getElementById('tablewidth').focus();">
-					<input type="radio" name="choosewidth" checked>
+					<input type="radio" name="choosewidth" checked />
 					<span id="tablewidthinput">
 						Širina cele tabele: &#8776;
-						<input id="tablewidth" type="number" name="tablewidth" min="1" max="1920" onkeypress="setTimeout(verifyInput,0)">
+						<input id="tablewidth" type="number" name="tablewidth" min="1" max="1920" onkeypress="setTimeout(verifyInput,0)" />
 						px
 					</span>
 				</label>
@@ -221,10 +222,10 @@ var alertMsg = "Ceo sadržaj tabele biće obrisan. Da li želite da nastavite?"<
 			</li>
 			<li>
 				<label onclick="document.getElementById('tablewidth').disabled = true;document.getElementById('cellwidth').disabled = false; document.getElementById('tablewidthinput').className = 'deact'; document.getElementById('cellwidthinput').className = ''; document.getElementById('cellwidth').focus();">
-					<input type="radio" name="choosewidth">
+					<input type="radio" name="choosewidth" />
 					<span id="cellwidthinput" class="deact">
 						Širina/visina ćelije:
-						<input id="cellwidth" type="number" name="cellwidth" min="1" max="99" onkeypress="setTimeout(verifyInput,0)" disabled>
+						<input id="cellwidth" type="number" name="cellwidth" min="1" max="99" onkeypress="setTimeout(verifyInput,0)" disabled />
 						px
 					</span>
 				</label>
@@ -233,6 +234,7 @@ var alertMsg = "Ceo sadržaj tabele biće obrisan. Da li želite da nastavite?"<
 			<li>
 				<button id="accept" class="accept" onclick="clickTableDim()">Prihvati</button>
 			</li>
+		</ul>
 	</div>
 </div>
 
