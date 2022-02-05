@@ -320,7 +320,7 @@ function step() {
 
 // prikazivanje rednog broja koraka simulacije (na osnovu sadržaja globalne varijable „counter“)
 function dispCounter() {
-	document.getElementById("counter").style = "inline"; // prikazivanje brojača (za slučaj da je bio sakriven)
+	document.getElementById("counter").style.display = "inline"; // prikazivanje brojača (za slučaj da je bio sakriven)
 	document.getElementById("counter").getElementsByTagName("span")[0].innerHTML = counter; // prikazivanje rednog broja koraka simulacije
 }
 
